@@ -27,6 +27,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.jsoup.nodes.Element;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,13 +41,11 @@ import com.example.wada.myapplication.Soramame;
 
 
 public class MainActivity extends ActionBarActivity {
-    public final static String EXTRA_MESSAGE = "com.example.wada.myapplication.MESSAGE" ;
+    private static final String SORAPREFFILE = "SoraPrefFile";
 
     private static  final  String SORABASEURL="http://soramame.taiki.go.jp/";
     private static final String SORASUBURL ="MstItiran.php";
     private static final String SORADATAURL = "DataList.php?MstCode=";
-
-
     // 指定都道府県の測定局一覧取得
     private static final String SORAPREFURL ="MstItiranFrame.php?Pref=";
 
@@ -158,7 +158,25 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // 都道府県情報取得
+    private void getPrefInfo()
+    {
+        try
+        {
+             FileInputStream infile = openFileInput(SORAPREFFILE);
+
+        }
+        catch (FileNotFoundException e)
+        {
+            // ファイルが無ければそらまめサイトにアクセス
+
+        }
+
+    }
+
     // 都道府県
+    // 内部ストレージにファイル保存する
+    // 都道府県名なので固定でも問題ないが。
     private class PrefSpinner extends AsyncTask<Void, Void, Void>
     {
         String url;
@@ -180,7 +198,7 @@ public class MainActivity extends ActionBarActivity {
                 Elements elements = doc.getElementsByTag("option");
                 ArrayList<String> prefList = new ArrayList<String>();
                 for( Element element : elements) {
-                    if (new Integer(element.attr("value")) != 0) {
+                    if (Integer.parseInt(element.attr("value")) != 0) {
                         prefList.add(element.text());
                     }
                 }
@@ -191,6 +209,7 @@ public class MainActivity extends ActionBarActivity {
             {
                 e.printStackTrace();
             }
+
             return null;
         }
 
@@ -204,6 +223,7 @@ public class MainActivity extends ActionBarActivity {
 
     }
 
+    // 都道府県の測定局データ取得
     private class Title extends AsyncTask<Void, Void, Void>
     {
         String url;
@@ -255,7 +275,7 @@ public class MainActivity extends ActionBarActivity {
                                 int nCode = kyoku.codePointAt(0);
                                 // PM2.5測定局のみ
                                 if( nCode == 9675 ) {
-                                    mList.add( new Soramame(new Integer(data.get(0).text()), data.get(1).text(), data.get(2).text()));
+                                    mList.add( new Soramame(Integer.parseInt(data.get(0).text()), data.get(1).text(), data.get(2).text()));
 
                                 }
                             }
