@@ -1,5 +1,6 @@
 package com.example.wada.myapplication;
 
+import android.app.ActionBar;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -7,6 +8,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -24,7 +26,6 @@ import java.util.Map;
 
 
 public class DisplayMessageActivity extends ListActivity {
-    ProgressDialog mProgressDialog;
 
     private SoramameAdapter mAdapter;
     ArrayList<Soramame.SoramameData> mList;
@@ -40,6 +41,13 @@ public class DisplayMessageActivity extends ListActivity {
         url = intent.getData().toString();
         new SoraDesc().execute(url);
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_display_message, menu);
+        return true;
     }
 
     @Override
@@ -60,7 +68,7 @@ public class DisplayMessageActivity extends ListActivity {
     private class SoraDesc extends AsyncTask<String, Void, Void>
     {
         Soramame soradata;
-
+        ProgressDialog mProgressDialog;
         @Override
         protected void onPreExecute()
         {
@@ -88,7 +96,6 @@ public class DisplayMessageActivity extends ListActivity {
                     Elements data = ta.getElementsByTag("td");
                     soradata.setData(data.get(0).text(), data.get(1).text(), data.get(2).text(), data.get(3).text(), data.get(14).text());
                 }
-
             }
             catch(IOException e)
             {
@@ -110,5 +117,4 @@ public class DisplayMessageActivity extends ListActivity {
             mProgressDialog.dismiss();
         }
     }
-
 }
