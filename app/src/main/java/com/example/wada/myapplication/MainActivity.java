@@ -208,6 +208,7 @@ public class MainActivity extends ActionBarActivity {
                         if (Integer.parseInt(element.attr("value")) != 0) {
                             strPref = element.text();
                             prefList.add(strPref);
+                            // ファイルから取得時に分割できるようにセパレータを追加する
                             outfile.write((strPref + ",").getBytes());
                         }
                     }
