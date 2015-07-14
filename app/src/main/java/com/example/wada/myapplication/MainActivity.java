@@ -2,7 +2,9 @@ package com.example.wada.myapplication;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
@@ -29,6 +31,7 @@ import org.jsoup.nodes.Element;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,9 +54,8 @@ public class MainActivity extends ActionBarActivity {
 
     ProgressDialog mProgressDialog;
     String m_strMstURL;     // 測定局のURL
-    int mPref ;
+    int mPref ;                     // 都道府県コード
     int mMstCode = 0;
-    boolean mFlag = false;
 
     private SoramameStationAdapter mAdapter;
     ArrayList<Soramame> mList;
@@ -81,6 +83,10 @@ public class MainActivity extends ActionBarActivity {
 //        }
 
         mPref = 0;
+        // 都道府県インデックスを取得
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        mPref = sharedPref.getInt("CurrentPref", 1);
+
         // SORASUBURLから都道府県名とコードを取得、スピナーに設定
         Spinner prefspinner = (Spinner)findViewById(R.id.spinner);
         prefspinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -88,8 +94,8 @@ public class MainActivity extends ActionBarActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 //                String strPref = parent.getItemAtPosition(position).toString();
 
-                mPref = position+1;
-                if(!mFlag){ mFlag = true; return ; }
+                mPref = position + 1;
+
                 new Title().execute();
             }
 
@@ -98,6 +104,8 @@ public class MainActivity extends ActionBarActivity {
 
             }
         });
+
+        // 都道府県取得
         new PrefSpinner().execute();
 
 //        Button titlebutton = (Button)findViewById(R.id.title_button);
@@ -129,7 +137,6 @@ public class MainActivity extends ActionBarActivity {
                     desc_view.setText(mList.get(pos).getMstName());
                     mMstCode = mList.get(pos).getMstCode();
 
-
                     new Desc().execute();
                 }
             }
@@ -158,29 +165,25 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    // 都道府県情報取得
-    private void getPrefInfo()
+    @Override
+    public void onPause()
     {
-        try
-        {
-             FileInputStream infile = openFileInput(SORAPREFFILE);
+        // 都道府県インデックスを保存する
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt("CurrentPref", mPref);
+        editor.commit();
 
-        }
-        catch (FileNotFoundException e)
-        {
-            // ファイルが無ければそらまめサイトにアクセス
-
-        }
-
+        super.onPause();
     }
+
 
     // 都道府県
     // 内部ストレージにファイル保存する
     // 都道府県名なので固定でも問題ないが。
     private class PrefSpinner extends AsyncTask<Void, Void, Void>
     {
-        String url;
-        ArrayAdapter<String> pref;
+        ArrayList<String> prefList = new ArrayList<String>();
 
         @Override
         protected void onPreExecute()
@@ -193,17 +196,23 @@ public class MainActivity extends ActionBarActivity {
         {
             try
             {
-                url = String.format("%s%s", SORABASEURL, SORASUBURL);
-                Document doc = Jsoup.connect(url).get();
-                Elements elements = doc.getElementsByTag("option");
-                ArrayList<String> prefList = new ArrayList<String>();
-                for( Element element : elements) {
-                    if (Integer.parseInt(element.attr("value")) != 0) {
-                        prefList.add(element.text());
+                if( getPrefInfo() > 0) {
+                    FileOutputStream outfile = openFileOutput(SORAPREFFILE, Context.MODE_PRIVATE);
+
+                    String url = String.format("%s%s", SORABASEURL, SORASUBURL);
+                    Document doc = Jsoup.connect(url).get();
+                    Elements elements = doc.getElementsByTag("option");
+
+                    String strPref;
+                    for (Element element : elements) {
+                        if (Integer.parseInt(element.attr("value")) != 0) {
+                            strPref = element.text();
+                            prefList.add(strPref);
+                            outfile.write((strPref + ",").getBytes());
+                        }
                     }
+                    outfile.close();
                 }
-                pref = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, prefList);
-                pref.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             }
             catch(IOException e)
             {
@@ -216,11 +225,44 @@ public class MainActivity extends ActionBarActivity {
         @Override
         protected void onPostExecute(Void result)
         {
+            ArrayAdapter<String> pref = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, prefList);
+            pref.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             // スピナーリスト設定
             Spinner prefSpinner = (Spinner)findViewById(R.id.spinner);
             prefSpinner.setAdapter(pref);
+            prefSpinner.setSelection(mPref-1);
         }
 
+        private int getPrefInfo()
+        {
+            int rc = 0 ;
+            try
+            {
+                FileInputStream infile = openFileInput(SORAPREFFILE);
+                byte[] readBytes = new byte[infile.available()];
+                infile.read(readBytes);
+                String strBytes = new String(readBytes);
+                infile.close();
+
+                prefList.clear();
+                String Pref[] = strBytes.split(",");
+                for( String ele : Pref)
+                {
+                   prefList.add(ele);
+                }
+            }
+            catch (FileNotFoundException e)
+            {
+                // ファイルが無ければそらまめサイトにアクセス
+                rc = 1;
+            }
+            catch(IOException e)
+            {
+                rc = -1;
+            }
+
+            return rc;
+        }
     }
 
     // 都道府県の測定局データ取得
@@ -308,17 +350,11 @@ public class MainActivity extends ActionBarActivity {
 
     private class Desc extends AsyncTask<Void, Void, Void>
     {
-        String url;
 
         @Override
         protected void onPreExecute()
         {
             super.onPreExecute();
-//            mProgressDialog = new ProgressDialog(MainActivity.this);
-//            mProgressDialog.setTitle( "そらまめ（データ取得）");
-//            mProgressDialog.setMessage("Loading...");
-//            mProgressDialog.setIndeterminate(false);
-//            mProgressDialog.show();
         }
 
         @Override
@@ -327,7 +363,7 @@ public class MainActivity extends ActionBarActivity {
             try
             {
                 // 本来、ここに測定局コードを指定する。
-                url = String.format("%s%s%d", SORABASEURL, SORADATAURL, mMstCode );
+                String url = String.format("%s%s%d", SORABASEURL, SORADATAURL, mMstCode );
                 Document doc = Jsoup.connect(url).get();
                 Elements elements = doc.getElementsByAttributeValue("name", "Hyou");
                 Integer size = elements.size();
@@ -353,14 +389,9 @@ public class MainActivity extends ActionBarActivity {
         @Override
         protected void onPostExecute(Void result)
         {
-            TextView desc_view = (TextView)findViewById(R.id.desc_text);
-            desc_view.setText(url);
-//            mProgressDialog.dismiss();
-
             Intent intent = new Intent(MainActivity.this, DisplayMessageActivity.class);
             intent.setData(Uri.parse(m_strMstURL));
             startActivity(intent);
         }
     }
-
 }
