@@ -63,8 +63,15 @@ public class Soramame {
             m_dDate = new Date(Integer.valueOf(strYear), Integer.valueOf(strMonth),
                     Integer.valueOf(strDay), Integer.valueOf(strHour), 0);
             // 未計測の場合、"-"が出力される。他のパターンもあった。
-            if( strValue.codePointAt(0) == 12288 || strValue.equalsIgnoreCase("-") ){ m_nPM25 = -100 ; }
-            else{ m_nPM25 = Integer.valueOf(strValue); }
+//            if( strValue.codePointAt(0) == 12288 || strValue.equalsIgnoreCase("-") ){ m_nPM25 = -100 ; }
+//            else{ m_nPM25 = Integer.valueOf(strValue); }
+            try{
+                m_nPM25 = Integer.parseInt(strValue);
+            }
+            catch(NumberFormatException e){
+                e.getMessage();
+                m_nPM25 = -100;
+            }
         }
 
         public Date getDate()
@@ -78,7 +85,7 @@ public class Soramame {
         }
         public  Integer getPM25()
         {
-            return m_nPM25;
+            return (m_nPM25 < 0 ? 0 : m_nPM25);
         }
         public String getPM25String(){ return String.format("%s",(m_nPM25 < 0 ? "未計測" : m_nPM25.toString()));}
 
@@ -92,7 +99,6 @@ public class Soramame {
             return String.format("%s:%s", getDateString(), getPM25String()) ;
         }
     }
-
 
     private SoramameStation m_Station;
     private ArrayList< SoramameData > m_aData;  // 測定データ
