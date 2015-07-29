@@ -10,6 +10,8 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
 
+import java.util.ArrayList;
+
 
 /**
  * そらまめ PM2.5測定値用グラフカスタムビュー
@@ -26,6 +28,8 @@ public class LunarBaseGraphView extends View {
     private float mTextHeight;
 
     private Soramame mSoramame;     // 測定局のPM2.5データ
+    private Paint mLine ;
+    private Paint mDot ;
 
     public LunarBaseGraphView(Context context) {
         super(context);
@@ -43,36 +47,48 @@ public class LunarBaseGraphView extends View {
     }
 
     private void init(AttributeSet attrs, int defStyle) {
-        // Load attributes
-        final TypedArray a = getContext().obtainStyledAttributes(
-                attrs, R.styleable.LunarBaseGraphView, defStyle, 0);
+        try {
+            // Load attributes
+            final TypedArray a = getContext().obtainStyledAttributes(
+                    attrs, R.styleable.LunarBaseGraphView, defStyle, 0);
 
-        mExampleString = a.getString(
-                R.styleable.LunarBaseGraphView_exampleString);
-        mExampleColor = a.getColor(
-                R.styleable.LunarBaseGraphView_exampleColor,
-                mExampleColor);
-        // Use getDimensionPixelSize or getDimensionPixelOffset when dealing with
-        // values that should fall on pixel boundaries.
-        mExampleDimension = a.getDimension(
-                R.styleable.LunarBaseGraphView_exampleDimension,
-                mExampleDimension);
+            mExampleString = a.getString(
+                    R.styleable.LunarBaseGraphView_exampleString);
+            mExampleColor = a.getColor(
+                    R.styleable.LunarBaseGraphView_exampleColor,
+                    mExampleColor);
+            // Use getDimensionPixelSize or getDimensionPixelOffset when dealing with
+            // values that should fall on pixel boundaries.
+            mExampleDimension = a.getDimension(
+                    R.styleable.LunarBaseGraphView_exampleDimension,
+                    mExampleDimension);
 
-        if (a.hasValue(R.styleable.LunarBaseGraphView_exampleDrawable)) {
-            mExampleDrawable = a.getDrawable(
-                    R.styleable.LunarBaseGraphView_exampleDrawable);
-            mExampleDrawable.setCallback(this);
+            if (a.hasValue(R.styleable.LunarBaseGraphView_exampleDrawable)) {
+                mExampleDrawable = a.getDrawable(
+                        R.styleable.LunarBaseGraphView_exampleDrawable);
+                mExampleDrawable.setCallback(this);
+            }
+
+            a.recycle();
+
+            // Set up a default TextPaint object
+            mTextPaint = new TextPaint();
+            mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
+            mTextPaint.setTextAlign(Paint.Align.LEFT);
+
+            // Update TextPaint and text measurements from attributes
+            invalidateTextPaintAndMeasurements();
+
+            mLine = new Paint();
+            mLine.setColor(Color.argb(125, 0, 0, 0));
+            mLine.setStrokeWidth(3);
+            mDot = new Paint();
+            mDot.setColor(Color.argb(255, 255, 0,0));
+            mDot.setStrokeWidth(2);
         }
-
-        a.recycle();
-
-        // Set up a default TextPaint object
-        mTextPaint = new TextPaint();
-        mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
-        mTextPaint.setTextAlign(Paint.Align.LEFT);
-
-        // Update TextPaint and text measurements from attributes
-        invalidateTextPaintAndMeasurements();
+        catch(java.lang.NullPointerException e){
+            e.getMessage();
+        }
     }
 
     private void invalidateTextPaintAndMeasurements() {
@@ -84,11 +100,25 @@ public class LunarBaseGraphView extends View {
         mTextHeight = fontMetrics.bottom;
     }
 
+    public void setData(Soramame sora){
+        if(mSoramame != null){ mSoramame = null; }
+        if( sora.getSize() < 1 ){ return ; }
+
+        mSoramame = new Soramame(sora.getMstCode(), sora.getMstName(), sora.getAddress());
+        ArrayList<Soramame.SoramameData> list = sora.getData();
+        for( Soramame.SoramameData data : list){
+            mSoramame.setData(data);
+        }
+        // 再描画
+        invalidate();
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
         // TODO: consider storing these as member variables to reduce
+        if(mSoramame == null){ return ; }
         // allocations per draw cycle.
         int paddingLeft = getPaddingLeft();
         int paddingTop = getPaddingTop();
@@ -101,6 +131,29 @@ public class LunarBaseGraphView extends View {
         // グラフ描画
         // グラフ枠
         // グラフ
+        if(mSoramame.getSize() > 0){
+            mLine.setStrokeWidth(3);
+            canvas.drawLine( paddingLeft, paddingTop+contentHeight, paddingLeft+contentWidth, paddingTop+contentHeight, mLine );
+            canvas.drawLine( paddingLeft, paddingTop, paddingLeft, contentHeight+paddingTop, mLine );
+            int y = paddingTop+contentHeight;
+            mLine.setStrokeWidth(1);
+            for(int i=0; i<5; i++){
+                y -= contentHeight/5;
+                canvas.drawLine( paddingLeft, y, paddingLeft+contentWidth, y, mLine );
+            }
+
+            ArrayList<Soramame.SoramameData> list = mSoramame.getData();
+            float x=paddingLeft+contentWidth;
+            float gap = (float)contentWidth/list.size();
+
+            for( Soramame.SoramameData data : list){
+                if( data.getPM25() > 0) {
+                    canvas.drawCircle(x, paddingTop + contentHeight - (data.getPM25() * contentHeight / 100), 3, mDot);
+                }
+                x -= gap;
+            }
+            mExampleString = String.format("x:%.1f gap:%.2f", x, gap);
+        }
 
         // Draw the text.
         canvas.drawText(mExampleString,
@@ -109,11 +162,11 @@ public class LunarBaseGraphView extends View {
                 mTextPaint);
 
         // Draw the example drawable on top of the text.
-        if (mExampleDrawable != null) {
-            mExampleDrawable.setBounds(paddingLeft, paddingTop,
-                    paddingLeft + contentWidth, paddingTop + contentHeight);
-            mExampleDrawable.draw(canvas);
-        }
+//        if (mExampleDrawable != null) {
+//            mExampleDrawable.setBounds(paddingLeft, paddingTop,
+//                    paddingLeft + contentWidth, paddingTop + contentHeight);
+//            mExampleDrawable.draw(canvas);
+//        }
     }
 
     /**

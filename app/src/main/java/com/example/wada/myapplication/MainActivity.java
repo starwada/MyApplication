@@ -141,6 +141,7 @@ public class MainActivity extends ActionBarActivity {
                 }
             }
         });
+
     }
 
     @Override
@@ -172,7 +173,8 @@ public class MainActivity extends ActionBarActivity {
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt("CurrentPref", mPref);
-        editor.commit();
+//        editor.commit();
+        editor.apply();
 
         super.onPause();
     }
@@ -390,7 +392,10 @@ public class MainActivity extends ActionBarActivity {
         @Override
         protected void onPostExecute(Void result)
         {
-            Intent intent = new Intent(MainActivity.this, DisplayMessageActivity.class);
+            // リスト用アクティビティ
+//            Intent intent = new Intent(MainActivity.this, DisplayMessageActivity.class);
+            // グラフ用アクティビティ
+            Intent intent = new Intent(MainActivity.this, GraphActivity.class);
             intent.setData(Uri.parse(m_strMstURL));
             startActivity(intent);
         }

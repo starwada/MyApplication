@@ -74,6 +74,11 @@ public class Soramame {
             }
         }
 
+        SoramameData(Date date, Integer nPM25){
+            m_dDate = date;
+            m_nPM25 = nPM25;
+        }
+
         public Date getDate()
         {
             return m_dDate;
@@ -125,6 +130,15 @@ public class Soramame {
     public void setData(String strYear, String strMonth, String strDay, String strHour, String strValue)
     {
         SoramameData data = new SoramameData(strYear, strMonth, strDay, strHour, strValue);
+        addData(data);
+    }
+
+    public void setData(SoramameData orig){
+        SoramameData data = new SoramameData(orig.getDate(), orig.getPM25());
+        addData(data);
+    }
+
+    private void addData(SoramameData data){
         if( m_aData == null){
             m_aData = new ArrayList<SoramameData>();
         }
