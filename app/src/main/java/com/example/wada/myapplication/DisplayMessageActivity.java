@@ -10,6 +10,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -27,7 +29,7 @@ import java.util.Map;
 
 
 public class DisplayMessageActivity extends ListActivity {
-
+    private Soramame mSoradata;
     private SoramameAdapter mAdapter;
     ArrayList<Soramame.SoramameData> mList;
 
@@ -40,8 +42,20 @@ public class DisplayMessageActivity extends ListActivity {
         Intent intent = getIntent() ;
         String url;
         url = intent.getData().toString();
+        mSoradata = intent.getParcelableExtra("mine");
         new SoraDesc().execute(url);
 
+        TextView tview = (TextView)findViewById(R.id.MstName);
+        tview.setText(mSoradata.getStationInfo());
+
+        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                LunarBaseGraphView graph = (LunarBaseGraphView)findViewById(R.id.soragraph);
+                graph.setPos(position);
+                return false;
+            }
+        });
     }
 
     @Override
@@ -68,12 +82,12 @@ public class DisplayMessageActivity extends ListActivity {
 
     private class SoraDesc extends AsyncTask<String, Void, Void>
     {
-        Soramame soradata;
         ProgressDialog mProgressDialog;
         @Override
         protected void onPreExecute()
         {
             super.onPreExecute();
+            mSoradata.clearData();
             mProgressDialog = new ProgressDialog(DisplayMessageActivity.this);
             mProgressDialog.setTitle( "そらまめ PM2.5データ取得");
             mProgressDialog.setMessage("Loading...");
@@ -90,12 +104,12 @@ public class DisplayMessageActivity extends ListActivity {
                 Element body = sora.body();
                 Elements tables = body.getElementsByAttributeValue("align", "right");
 
-                soradata = new Soramame(40103120, "", "");
+                //mSoradata = new Soramame(40103120, "", "");
 
                 for( Element ta : tables)
                 {
                     Elements data = ta.getElementsByTag("td");
-                    soradata.setData(data.get(0).text(), data.get(1).text(), data.get(2).text(), data.get(3).text(), data.get(14).text());
+                    mSoradata.setData(data.get(0).text(), data.get(1).text(), data.get(2).text(), data.get(3).text(), data.get(14).text());
                 }
             }
             catch(IOException e)
@@ -108,12 +122,16 @@ public class DisplayMessageActivity extends ListActivity {
         @Override
         protected void onPostExecute(Void result)
         {
-            mList = soradata.getData();
+            mList = mSoradata.getData();
             if(mList != null)
             {
                 mAdapter = new SoramameAdapter(DisplayMessageActivity.this, mList);
                 setListAdapter(mAdapter);
             }
+            LunarBaseGraphView view = (LunarBaseGraphView)findViewById(R.id.soragraph);
+            view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+            view.setData(mSoradata);
+            mSoradata = null;
 
             mProgressDialog.dismiss();
         }

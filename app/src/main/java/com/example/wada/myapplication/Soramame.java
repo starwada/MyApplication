@@ -1,17 +1,21 @@
 package com.example.wada.myapplication;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.ArrayList;
 import java.util.Date;
 
 
 /**
  * そらまめデータ
+ * Intentで渡せるようにParcelableを使用
  * Created by Wada on 2015/07/03.
  */
-public class Soramame {
+public class Soramame implements Parcelable{
+
     // そらまめの測定局データ
-    public  class SoramameStation
-    {
+    public  class SoramameStation{
         private int m_nCode;                // 測定局コード
         private String m_strName;       // 測定局名称
         private String m_strAddress;    // 住所
@@ -108,6 +112,36 @@ public class Soramame {
     private SoramameStation m_Station;
     private ArrayList< SoramameData > m_aData;  // 測定データ
 
+    @Override
+    public int describeContents(){
+        return 0;
+    }
+
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeInt(m_Station.getCode());
+        out.writeString(m_Station.getName());
+        out.writeString(m_Station.getAddress());
+    }
+
+    public static final Parcelable.Creator<Soramame> CREATOR
+            = new Parcelable.Creator<Soramame>() {
+        public Soramame createFromParcel(Parcel in) {
+            return new Soramame(in);
+        }
+
+        public Soramame[] newArray(int size) {
+            return new Soramame[size];
+        }
+    };
+    public Soramame(){
+        super();
+    }
+
+    private Soramame(Parcel in) {
+        m_Station = new SoramameStation(in.readInt(), in.readString(), in.readString());
+        m_aData  = null;
+    }
+
     Soramame(int nCode, String strName, String strAddress)
     {
         m_Station = new SoramameStation(nCode, strName, strAddress);
@@ -136,6 +170,12 @@ public class Soramame {
     public void setData(SoramameData orig){
         SoramameData data = new SoramameData(orig.getDate(), orig.getPM25());
         addData(data);
+    }
+
+    public void clearData(){
+        if( m_aData != null){
+            m_aData.clear();
+        }
     }
 
     private void addData(SoramameData data){

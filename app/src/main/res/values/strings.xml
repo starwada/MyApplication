@@ -7,6 +7,6 @@
     <string name="Title">Title</string>
     <string name="desc">Desc</string>
 
-    <string name="hello_world">Hello world!</string>
+    <string name="hello_world">そらまめ!</string>
     <string name="title_activity_graph">GraphActivity</string>
 </resources>

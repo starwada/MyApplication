@@ -5,6 +5,8 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
@@ -28,8 +30,12 @@ public class LunarBaseGraphView extends View {
     private float mTextHeight;
 
     private Soramame mSoramame;     // 測定局のPM2.5データ
+    private Paint mBack;
     private Paint mLine ;
     private Paint mDot ;
+    private RectF mRect;
+
+    private int mIndex;
 
     public LunarBaseGraphView(Context context) {
         super(context);
@@ -79,12 +85,16 @@ public class LunarBaseGraphView extends View {
             // Update TextPaint and text measurements from attributes
             invalidateTextPaintAndMeasurements();
 
+            mBack = new Paint();
+            mBack.setColor(Color.argb(75, 0, 0, 255));
             mLine = new Paint();
             mLine.setColor(Color.argb(125, 0, 0, 0));
             mLine.setStrokeWidth(3);
             mDot = new Paint();
-            mDot.setColor(Color.argb(255, 255, 0,0));
+            mDot.setColor(Color.argb(255, 255, 0, 0));
             mDot.setStrokeWidth(2);
+            mRect = new RectF();
+            mIndex = 0;
         }
         catch(java.lang.NullPointerException e){
             e.getMessage();
@@ -113,6 +123,11 @@ public class LunarBaseGraphView extends View {
         invalidate();
     }
 
+    public void setPos(int position){
+        mIndex = position;
+        invalidate();
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
@@ -129,16 +144,44 @@ public class LunarBaseGraphView extends View {
         int contentHeight = getHeight() - paddingTop - paddingBottom;
 
         // グラフ描画
+        // グラフ背景
+        float y = (float)(paddingTop+contentHeight);
+        float rh = (float)contentHeight/100;
+
+        // ～１０
+        mRect.set( (float)paddingLeft, y-rh*10, (float)(paddingLeft+contentWidth), y);
+        mBack.setColor(Color.argb(75, 0, 0, 255));
+        canvas.drawRect(mRect, mBack);
+        // １１～１５
+        mRect.set( (float)paddingLeft, y-rh*15, (float)(paddingLeft+contentWidth), y-rh*10);
+        mBack.setColor(Color.argb(75, 0, 255,255));
+        canvas.drawRect(mRect, mBack);
+        // １６～３５
+        mRect.set( (float)paddingLeft, y-rh*35, (float)(paddingLeft+contentWidth), y-rh*15);
+        mBack.setColor(Color.argb(75, 0, 255,128));
+        canvas.drawRect(mRect, mBack);
+        // ３６～５０
+        mRect.set( (float)paddingLeft, y-rh*50, (float)(paddingLeft+contentWidth), y-rh*35);
+        mBack.setColor(Color.argb(75, 255, 255,0));
+        canvas.drawRect(mRect, mBack);
+        // ５１～７０
+        mRect.set( (float)paddingLeft, y-rh*70, (float)(paddingLeft+contentWidth), y-rh*50);
+        mBack.setColor(Color.argb(75, 255, 128,0));
+        canvas.drawRect(mRect, mBack);
+        // ７０～
+        mRect.set( (float)paddingLeft, y-rh*100, (float)(paddingLeft+contentWidth), y-rh*70);
+        mBack.setColor(Color.argb(75, 255, 0,0));
+        canvas.drawRect(mRect, mBack);
         // グラフ枠
         // グラフ
         if(mSoramame.getSize() > 0){
             mLine.setStrokeWidth(3);
-            canvas.drawLine( paddingLeft, paddingTop+contentHeight, paddingLeft+contentWidth, paddingTop+contentHeight, mLine );
+            canvas.drawLine(paddingLeft, paddingTop + contentHeight, paddingLeft + contentWidth, paddingTop + contentHeight, mLine);
             canvas.drawLine( paddingLeft, paddingTop, paddingLeft, contentHeight+paddingTop, mLine );
-            int y = paddingTop+contentHeight;
+            y = (float)(paddingTop+contentHeight);
             mLine.setStrokeWidth(1);
             for(int i=0; i<5; i++){
-                y -= contentHeight/5;
+                y -= (float)contentHeight/5;
                 canvas.drawLine( paddingLeft, y, paddingLeft+contentWidth, y, mLine );
             }
 
@@ -146,13 +189,30 @@ public class LunarBaseGraphView extends View {
             float x=paddingLeft+contentWidth;
             float gap = (float)contentWidth/list.size();
 
+            y = (float)(paddingTop + contentHeight);
+            float[] vert = new float[6];
+
+            int nCount=0;
+            float doty = 0f;
             for( Soramame.SoramameData data : list){
+                doty = y - (data.getPM25() * (float)contentHeight / 100);
                 if( data.getPM25() > 0) {
-                    canvas.drawCircle(x, paddingTop + contentHeight - (data.getPM25() * contentHeight / 100), 3, mDot);
+                    canvas.drawCircle(x, doty, 3, mDot);
                 }
+                if( nCount == mIndex){
+                    vert[0]=x;
+                    vert[1] = doty;
+                    vert[2]=x+gap*2;
+                    vert[3]=doty-30;
+                    vert[4]=x-gap*2;
+                    vert[5]=vert[3];
+
+                    canvas.drawVertices(Canvas.VertexMode.TRIANGLES, 6, vert, 0, null, 0,null,0,null,0,0, mDot);
+                }
+                nCount += 1;
                 x -= gap;
             }
-            mExampleString = String.format("x:%.1f gap:%.2f", x, gap);
+            mExampleString = String.format("height:%d gap:%.2f", contentHeight, rh);
         }
 
         // Draw the text.

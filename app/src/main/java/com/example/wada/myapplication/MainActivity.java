@@ -55,7 +55,7 @@ public class MainActivity extends ActionBarActivity {
     ProgressDialog mProgressDialog;
     String m_strMstURL;     // 測定局のURL
     int mPref ;                     // 都道府県コード
-    int mMstCode = 0;
+    private Soramame mSoramame;
 
     private SoramameStationAdapter mAdapter;
     ArrayList<Soramame> mList;
@@ -131,11 +131,10 @@ public class MainActivity extends ActionBarActivity {
             public void onItemClick( AdapterView<?> parent, View v, int pos, long id)
             {
                 if(mList!=null) {
-                    mMstCode = 0;
                     TextView desc_view = (TextView) findViewById(R.id.desc_text);
 //                desc_view.setText(String.format("%d", pos));
-                    desc_view.setText(mList.get(pos).getMstName());
-                    mMstCode = mList.get(pos).getMstCode();
+                    mSoramame = mList.get(pos);
+                    desc_view.setText(mSoramame.getMstName());
 
                     new Desc().execute();
                 }
@@ -278,7 +277,7 @@ public class MainActivity extends ActionBarActivity {
         {
             super.onPreExecute();
             mProgressDialog = new ProgressDialog(MainActivity.this);
-            mProgressDialog.setTitle( "そらまめ（測定局取得） test");
+            mProgressDialog.setTitle( "そらまめ（測定局取得）");
             mProgressDialog.setMessage("Loading...");
             mProgressDialog.setIndeterminate(false);
             mProgressDialog.show();
@@ -365,11 +364,12 @@ public class MainActivity extends ActionBarActivity {
         {
             try
             {
+                if(mSoramame == null){ return null;}
                 // 本来、ここに測定局コードを指定する。
-                String url = String.format("%s%s%d", SORABASEURL, SORADATAURL, mMstCode );
+                String url = String.format("%s%s%d", SORABASEURL, SORADATAURL, mSoramame.getMstCode());
                 Document doc = Jsoup.connect(url).get();
                 Elements elements = doc.getElementsByAttributeValue("name", "Hyou");
-                Integer size = elements.size();
+//                Integer size = elements.size();
                 for( Element element : elements)
                 {
                     if( element.hasAttr("src"))
@@ -393,10 +393,11 @@ public class MainActivity extends ActionBarActivity {
         protected void onPostExecute(Void result)
         {
             // リスト用アクティビティ
-//            Intent intent = new Intent(MainActivity.this, DisplayMessageActivity.class);
+            Intent intent = new Intent(MainActivity.this, DisplayMessageActivity.class);
             // グラフ用アクティビティ
-            Intent intent = new Intent(MainActivity.this, GraphActivity.class);
+//            Intent intent = new Intent(MainActivity.this, GraphActivity.class);
             intent.setData(Uri.parse(m_strMstURL));
+            intent.putExtra("mine", mSoramame);
             startActivity(intent);
         }
     }

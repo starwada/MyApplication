@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -14,16 +15,21 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class GraphActivity extends ActionBarActivity {
     private Soramame mSoramame;
+    private SoramameAdapter mAdapter;
+    ArrayList<Soramame.SoramameData> mList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_graph);
 
+        if(mList != null){ mList.clear(); }
         Intent intent = getIntent() ;
         String url;
         url = intent.getData().toString();
