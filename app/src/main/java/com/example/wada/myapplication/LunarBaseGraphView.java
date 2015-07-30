@@ -156,11 +156,12 @@ public class LunarBaseGraphView extends View {
         // ～１０
         mRect.set( (float)paddingLeft, y-rh*10, (float)(paddingLeft+contentWidth), y);
 //        mBack.setColor(Color.argb(75, 0, 0, 255));
-        mBack.setColor(0xFF90CAF9);
+        mBack.setColor(0xFF2196F3);
         canvas.drawRect(mRect, mBack);
         // １１～１５
         mRect.set( (float)paddingLeft, y-rh*15, (float)(paddingLeft+contentWidth), y-rh*10);
-        mBack.setColor(Color.argb(75, 0, 255,255));
+//        mBack.setColor(Color.argb(75, 0, 255,255));
+        mBack.setColor(0xFF81D4FA);
         canvas.drawRect(mRect, mBack);
         // １６～３５
         mRect.set( (float)paddingLeft, y-rh*35, (float)(paddingLeft+contentWidth), y-rh*15);
