@@ -5,7 +5,6 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
@@ -30,6 +29,7 @@ public class LunarBaseGraphView extends View {
     private float mTextHeight;
 
     private Soramame mSoramame;     // 測定局のPM2.5データ
+    private int mPM25Max;
     private Paint mBack;
     private Paint mLine ;
     private Paint mDot ;
@@ -86,6 +86,7 @@ public class LunarBaseGraphView extends View {
             // Update TextPaint and text measurements from attributes
             invalidateTextPaintAndMeasurements();
 
+            mPM25Max = 0;
             mBack = new Paint();
             mBack.setColor(Color.argb(75, 0, 0, 255));
             mLine = new Paint();
@@ -116,9 +117,11 @@ public class LunarBaseGraphView extends View {
         if(mSoramame != null){ mSoramame = null; }
         if( sora.getSize() < 1 ){ return ; }
 
+        mPM25Max = 0;
         mSoramame = new Soramame(sora.getMstCode(), sora.getMstName(), sora.getAddress());
         ArrayList<Soramame.SoramameData> list = sora.getData();
         for( Soramame.SoramameData data : list){
+            if( data.getPM25() > mPM25Max ){ mPM25Max = data.getPM25(); }
             mSoramame.setData(data);
         }
         // 再描画
@@ -152,7 +155,8 @@ public class LunarBaseGraphView extends View {
 
         // ～１０
         mRect.set( (float)paddingLeft, y-rh*10, (float)(paddingLeft+contentWidth), y);
-        mBack.setColor(Color.argb(75, 0, 0, 255));
+//        mBack.setColor(Color.argb(75, 0, 0, 255));
+        mBack.setColor(0xFF90CAF9);
         canvas.drawRect(mRect, mBack);
         // １１～１５
         mRect.set( (float)paddingLeft, y-rh*15, (float)(paddingLeft+contentWidth), y-rh*10);
@@ -214,7 +218,7 @@ public class LunarBaseGraphView extends View {
                 nCount += 1;
                 x -= gap;
             }
-            mExampleString = String.format("height:%d gap:%.2f", contentHeight, rh);
+            mExampleString = String.format("最高値:%02d ", mPM25Max);
         }
 
         // Draw the text.
