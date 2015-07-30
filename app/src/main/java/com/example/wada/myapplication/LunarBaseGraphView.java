@@ -34,6 +34,7 @@ public class LunarBaseGraphView extends View {
     private Paint mLine ;
     private Paint mDot ;
     private RectF mRect;
+    private float[] mVert;
 
     private int mIndex;
 
@@ -94,6 +95,7 @@ public class LunarBaseGraphView extends View {
             mDot.setColor(Color.argb(255, 255, 0, 0));
             mDot.setStrokeWidth(2);
             mRect = new RectF();
+            mVert = new float[6];
             mIndex = 0;
         }
         catch(java.lang.NullPointerException e){
@@ -172,25 +174,25 @@ public class LunarBaseGraphView extends View {
         mRect.set( (float)paddingLeft, y-rh*100, (float)(paddingLeft+contentWidth), y-rh*70);
         mBack.setColor(Color.argb(75, 255, 0,0));
         canvas.drawRect(mRect, mBack);
+
         // グラフ枠
+        mLine.setStrokeWidth(3);
+        canvas.drawLine(paddingLeft, paddingTop + contentHeight, paddingLeft + contentWidth, paddingTop + contentHeight, mLine);
+        canvas.drawLine( paddingLeft, paddingTop, paddingLeft, contentHeight+paddingTop, mLine );
+        y = (float)(paddingTop+contentHeight);
+        mLine.setStrokeWidth(1);
+        for(int i=0; i<5; i++){
+            y -= (float)contentHeight/5;
+            canvas.drawLine( paddingLeft, y, paddingLeft+contentWidth, y, mLine );
+        }
+
         // グラフ
         if(mSoramame.getSize() > 0){
-            mLine.setStrokeWidth(3);
-            canvas.drawLine(paddingLeft, paddingTop + contentHeight, paddingLeft + contentWidth, paddingTop + contentHeight, mLine);
-            canvas.drawLine( paddingLeft, paddingTop, paddingLeft, contentHeight+paddingTop, mLine );
-            y = (float)(paddingTop+contentHeight);
-            mLine.setStrokeWidth(1);
-            for(int i=0; i<5; i++){
-                y -= (float)contentHeight/5;
-                canvas.drawLine( paddingLeft, y, paddingLeft+contentWidth, y, mLine );
-            }
-
             ArrayList<Soramame.SoramameData> list = mSoramame.getData();
             float x=paddingLeft+contentWidth;
             float gap = (float)contentWidth/list.size();
 
             y = (float)(paddingTop + contentHeight);
-            float[] vert = new float[6];
 
             int nCount=0;
             float doty = 0f;
@@ -200,14 +202,14 @@ public class LunarBaseGraphView extends View {
                     canvas.drawCircle(x, doty, 3, mDot);
                 }
                 if( nCount == mIndex){
-                    vert[0]=x;
-                    vert[1] = doty;
-                    vert[2]=x+gap*2;
-                    vert[3]=doty-30;
-                    vert[4]=x-gap*2;
-                    vert[5]=vert[3];
+                    mVert[0]=x;
+                    mVert[1] = doty;
+                    mVert[2]=x+gap*2;
+                    mVert[3]=doty-30;
+                    mVert[4]=x-gap*2;
+                    mVert[5]=mVert[3];
 
-                    canvas.drawVertices(Canvas.VertexMode.TRIANGLES, 6, vert, 0, null, 0,null,0,null,0,0, mDot);
+                    canvas.drawVertices(Canvas.VertexMode.TRIANGLES, 6, mVert, 0, null, 0,null,0,null,0,0, mDot);
                 }
                 nCount += 1;
                 x -= gap;
