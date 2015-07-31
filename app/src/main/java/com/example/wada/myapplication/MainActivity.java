@@ -64,24 +64,6 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // これで、住所から緯度経度を取得 以下テストコードなのでコメントとする
-//        try {
-//            Geocoder geo = new Geocoder(MainActivity.this, Locale.JAPAN);
-//            List<Address> address = geo.getFromLocationName("北九州市八幡西区浅川学園台３－６－１", 1);
-//
-//            // getAdminArea()にて都道府県名、getSubAdminArea()はnullだった。
-//            String strAd = String.format("Lati:%f Longi:%f AdminArea:%s SubAdmin:%s",
-//                    address.get(0).getLatitude(), address.get(0).getLongitude(),
-//                    address.get(0).getAdminArea(), address.get(0).getSubAdminArea());
-//            TextView title_view = (TextView)findViewById(R.id.title_text);
-//            title_view.setText(strAd);
-//            return;
-//        }
-//        catch(IOException e) {
-//
-//        }
-
         mPref = 0;
         // 都道府県インデックスを取得
         SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
@@ -394,8 +376,6 @@ public class MainActivity extends ActionBarActivity {
         {
             // リスト用アクティビティ
             Intent intent = new Intent(MainActivity.this, DisplayMessageActivity.class);
-            // グラフ用アクティビティ
-//            Intent intent = new Intent(MainActivity.this, GraphActivity.class);
             intent.setData(Uri.parse(m_strMstURL));
             intent.putExtra("mine", mSoramame);
             startActivity(intent);

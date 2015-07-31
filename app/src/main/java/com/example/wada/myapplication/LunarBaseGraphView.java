@@ -5,7 +5,6 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
@@ -13,6 +12,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 /**
@@ -30,6 +30,7 @@ public class LunarBaseGraphView extends View {
     private float mTextHeight;
 
     private Soramame mSoramame;     // 測定局のPM2.5データ
+    private int mPM25Max;
     private Paint mBack;
     private Paint mLine ;
     private Paint mDot ;
@@ -86,6 +87,7 @@ public class LunarBaseGraphView extends View {
             // Update TextPaint and text measurements from attributes
             invalidateTextPaintAndMeasurements();
 
+            mPM25Max = 0;
             mBack = new Paint();
             mBack.setColor(Color.argb(75, 0, 0, 255));
             mLine = new Paint();
@@ -109,16 +111,20 @@ public class LunarBaseGraphView extends View {
         mTextWidth = mTextPaint.measureText(mExampleString);
 
         Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
-        mTextHeight = fontMetrics.bottom;
+//        mTextHeight = fontMetrics.bottom;
+        // ほぼ文字高さのようなので、マイナスで返るので反転
+        mTextHeight = -fontMetrics.ascent;
     }
 
     public void setData(Soramame sora){
         if(mSoramame != null){ mSoramame = null; }
         if( sora.getSize() < 1 ){ return ; }
 
+        mPM25Max = 0;
         mSoramame = new Soramame(sora.getMstCode(), sora.getMstName(), sora.getAddress());
         ArrayList<Soramame.SoramameData> list = sora.getData();
         for( Soramame.SoramameData data : list){
+            if( data.getPM25() > mPM25Max ){ mPM25Max = data.getPM25(); }
             mSoramame.setData(data);
         }
         // 再描画
@@ -152,11 +158,13 @@ public class LunarBaseGraphView extends View {
 
         // ～１０
         mRect.set( (float)paddingLeft, y-rh*10, (float)(paddingLeft+contentWidth), y);
-        mBack.setColor(Color.argb(75, 0, 0, 255));
+//        mBack.setColor(Color.argb(75, 0, 0, 255));
+        mBack.setColor(0xFF2196F3);
         canvas.drawRect(mRect, mBack);
         // １１～１５
         mRect.set( (float)paddingLeft, y-rh*15, (float)(paddingLeft+contentWidth), y-rh*10);
-        mBack.setColor(Color.argb(75, 0, 255,255));
+//        mBack.setColor(Color.argb(75, 0, 255,255));
+        mBack.setColor(0xFF81D4FA);
         canvas.drawRect(mRect, mBack);
         // １６～３５
         mRect.set( (float)paddingLeft, y-rh*35, (float)(paddingLeft+contentWidth), y-rh*15);
@@ -201,6 +209,13 @@ public class LunarBaseGraphView extends View {
                 if( data.getPM25() > 0) {
                     canvas.drawCircle(x, doty, 3, mDot);
                 }
+                // 時間軸描画
+                if( data.getDate().get(Calendar.HOUR_OF_DAY) == 0 ){
+                    canvas.drawLine( x, paddingTop, x, contentHeight+paddingTop, mLine );
+                    // 日付描画
+                    canvas.drawText(String.format("%02d日", data.getDate().get(Calendar.DAY_OF_MONTH)), x, paddingTop+mTextHeight, mTextPaint);
+                }
+                // リストにてクリックしたインデックスデータに描画<-ここを画像に切替える
                 if( nCount == mIndex){
                     mVert[0]=x;
                     mVert[1] = doty;
@@ -214,13 +229,14 @@ public class LunarBaseGraphView extends View {
                 nCount += 1;
                 x -= gap;
             }
-            mExampleString = String.format("height:%d gap:%.2f", contentHeight, rh);
+            mExampleString = String.format("PM2.5 最高値:%02d　μg/m3", mPM25Max);
         }
 
         // Draw the text.
         canvas.drawText(mExampleString,
                 paddingLeft + (contentWidth - mTextWidth) / 2,
-                paddingTop + (contentHeight + mTextHeight) / 2,
+//                paddingTop + (contentHeight + mTextHeight) / 2,
+                paddingTop + (float)contentHeight/5 + mTextHeight,
                 mTextPaint);
 
         // Draw the example drawable on top of the text.

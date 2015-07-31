@@ -4,7 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 
 /**
@@ -53,18 +54,19 @@ public class Soramame implements Parcelable{
         }
         public String getString()
         {
-            return String.format("%d %s:%s", m_nCode, m_strName, m_strAddress);
+//            return String.format("%d %s:%s", m_nCode, m_strName, m_strAddress);
+            return String.format("%s:%s", m_strName, m_strAddress);
         }
     }
 
     // そらまめの測定データクラス
     public class SoramameData {
-        private Date m_dDate;       // 測定日時 UTCのみのようだ
+        private GregorianCalendar m_dDate;       // 測定日時 UTCのみのようだ
         private Integer m_nPM25;    // PM2.5測定値 未計測は-100を設定
 
         SoramameData(String strYear, String strMonth, String strDay, String strHour, String strValue)
         {
-            m_dDate = new Date(Integer.valueOf(strYear), Integer.valueOf(strMonth),
+            m_dDate = new GregorianCalendar(Integer.valueOf(strYear), Integer.valueOf(strMonth),
                     Integer.valueOf(strDay), Integer.valueOf(strHour), 0);
             // 未計測の場合、"-"が出力される。他のパターンもあった。
 //            if( strValue.codePointAt(0) == 12288 || strValue.equalsIgnoreCase("-") ){ m_nPM25 = -100 ; }
@@ -78,19 +80,25 @@ public class Soramame implements Parcelable{
             }
         }
 
-        SoramameData(Date date, Integer nPM25){
-            m_dDate = date;
+        SoramameData(GregorianCalendar date, Integer nPM25){
+            m_dDate = new GregorianCalendar(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH), date.get(Calendar.HOUR_OF_DAY), 0, 0);
             m_nPM25 = nPM25;
         }
 
-        public Date getDate()
+        public GregorianCalendar getDate()
         {
             return m_dDate;
         }
-        public String getDateString()
-        {
+        public String getCalendarString(){
             return String.format("%s/%s/%s %s時",
-                    m_dDate.getYear(), m_dDate.getMonth(), m_dDate.getDate(), m_dDate.getHours());
+                    m_dDate.get(Calendar.YEAR), m_dDate.get(Calendar.MONTH), m_dDate.get(Calendar.DAY_OF_MONTH), m_dDate.get(Calendar.HOUR_OF_DAY));
+        }
+        public String getDateString(){
+            return String.format("%s/%s/%s",
+                    m_dDate.get(Calendar.YEAR), m_dDate.get(Calendar.MONTH), m_dDate.get(Calendar.DAY_OF_MONTH));
+        }
+        public String getHourString(){
+            return String.format("%d時", m_dDate.get(Calendar.HOUR_OF_DAY));
         }
         public  Integer getPM25()
         {

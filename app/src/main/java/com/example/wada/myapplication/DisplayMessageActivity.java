@@ -48,12 +48,20 @@ public class DisplayMessageActivity extends ListActivity {
         TextView tview = (TextView)findViewById(R.id.MstName);
         tview.setText(mSoradata.getStationInfo());
 
-        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+//        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//                LunarBaseGraphView graph = (LunarBaseGraphView) findViewById(R.id.soragraph);
+//                graph.setPos(position);
+//                return false;
+//            }
+//        });
+
+        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                LunarBaseGraphView graph = (LunarBaseGraphView)findViewById(R.id.soragraph);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                LunarBaseGraphView graph = (LunarBaseGraphView) findViewById(R.id.soragraph);
                 graph.setPos(position);
-                return false;
             }
         });
     }
@@ -80,6 +88,12 @@ public class DisplayMessageActivity extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(mList != null){ mList.clear(); }
+    }
+
     private class SoraDesc extends AsyncTask<String, Void, Void>
     {
         ProgressDialog mProgressDialog;
@@ -103,8 +117,6 @@ public class DisplayMessageActivity extends ListActivity {
                 Document sora = Jsoup.connect(urls[0]).get();
                 Element body = sora.body();
                 Elements tables = body.getElementsByAttributeValue("align", "right");
-
-                //mSoradata = new Soramame(40103120, "", "");
 
                 for( Element ta : tables)
                 {

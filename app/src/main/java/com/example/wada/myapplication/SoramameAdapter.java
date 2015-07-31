@@ -18,6 +18,7 @@ class ViewHolder
 {
 //    ImageView image;
     TextView date;
+    TextView hour;
     TextView value;
 }
 
@@ -41,9 +42,9 @@ public class SoramameAdapter extends ArrayAdapter<Soramame.SoramameData> {
             holder = new ViewHolder();
 //            holder.image = (ImageView)convertView.findViewById(R.id.image);
             holder.date = (TextView)convertView.findViewById(R.id.date);
+            holder.hour = (TextView)convertView.findViewById(R.id.hour);
             holder.value = (TextView)convertView.findViewById(R.id.value);
             convertView.setTag(holder);
-
         }
         else
         {
@@ -52,6 +53,7 @@ public class SoramameAdapter extends ArrayAdapter<Soramame.SoramameData> {
 
         Soramame.SoramameData data = getItem(position);
         holder.date.setText(data.getDateString());
+        holder.hour.setText(data.getHourString());
         holder.value.setText(data.getPM25String());
 
         return convertView;
