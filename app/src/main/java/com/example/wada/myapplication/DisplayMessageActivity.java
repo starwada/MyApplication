@@ -48,12 +48,20 @@ public class DisplayMessageActivity extends ListActivity {
         TextView tview = (TextView)findViewById(R.id.MstName);
         tview.setText(mSoradata.getStationInfo());
 
-        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener(){
+//        getListView().setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//                LunarBaseGraphView graph = (LunarBaseGraphView) findViewById(R.id.soragraph);
+//                graph.setPos(position);
+//                return false;
+//            }
+//        });
+
+        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                LunarBaseGraphView graph = (LunarBaseGraphView)findViewById(R.id.soragraph);
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                LunarBaseGraphView graph = (LunarBaseGraphView) findViewById(R.id.soragraph);
                 graph.setPos(position);
-                return false;
             }
         });
     }

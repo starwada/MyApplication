@@ -12,6 +12,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 
 /**
@@ -110,7 +111,9 @@ public class LunarBaseGraphView extends View {
         mTextWidth = mTextPaint.measureText(mExampleString);
 
         Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
-        mTextHeight = fontMetrics.bottom;
+//        mTextHeight = fontMetrics.bottom;
+        // ほぼ文字高さのようなので、マイナスで返るので反転
+        mTextHeight = -fontMetrics.ascent;
     }
 
     public void setData(Soramame sora){
@@ -206,6 +209,12 @@ public class LunarBaseGraphView extends View {
                 if( data.getPM25() > 0) {
                     canvas.drawCircle(x, doty, 3, mDot);
                 }
+                // 時間軸描画
+                if( data.getDate().get(Calendar.HOUR_OF_DAY) == 0 ){
+                    canvas.drawLine( x, paddingTop, x, contentHeight+paddingTop, mLine );
+                    canvas.drawText(String.format("%02d日", data.getDate().get(Calendar.DAY_OF_MONTH)), x, paddingTop+mTextHeight, mTextPaint);
+                }
+                // リストにてクリックしたインデックスデータに描画
                 if( nCount == mIndex){
                     mVert[0]=x;
                     mVert[1] = doty;
@@ -219,13 +228,14 @@ public class LunarBaseGraphView extends View {
                 nCount += 1;
                 x -= gap;
             }
-            mExampleString = String.format("最高値:%02d ", mPM25Max);
+            mExampleString = String.format("最高値:%02d", mPM25Max);
         }
 
         // Draw the text.
         canvas.drawText(mExampleString,
                 paddingLeft + (contentWidth - mTextWidth) / 2,
-                paddingTop + (contentHeight + mTextHeight) / 2,
+//                paddingTop + (contentHeight + mTextHeight) / 2,
+                paddingTop + (float)contentHeight/5 + mTextHeight,
                 mTextPaint);
 
         // Draw the example drawable on top of the text.
