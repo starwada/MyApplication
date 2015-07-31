@@ -212,9 +212,10 @@ public class LunarBaseGraphView extends View {
                 // 時間軸描画
                 if( data.getDate().get(Calendar.HOUR_OF_DAY) == 0 ){
                     canvas.drawLine( x, paddingTop, x, contentHeight+paddingTop, mLine );
+                    // 日付描画
                     canvas.drawText(String.format("%02d日", data.getDate().get(Calendar.DAY_OF_MONTH)), x, paddingTop+mTextHeight, mTextPaint);
                 }
-                // リストにてクリックしたインデックスデータに描画
+                // リストにてクリックしたインデックスデータに描画<-ここを画像に切替える
                 if( nCount == mIndex){
                     mVert[0]=x;
                     mVert[1] = doty;
@@ -228,7 +229,7 @@ public class LunarBaseGraphView extends View {
                 nCount += 1;
                 x -= gap;
             }
-            mExampleString = String.format("最高値:%02d", mPM25Max);
+            mExampleString = String.format("PM2.5 最高値:%02d　μg/m3", mPM25Max);
         }
 
         // Draw the text.

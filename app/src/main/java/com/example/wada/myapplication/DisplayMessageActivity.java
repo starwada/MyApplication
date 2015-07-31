@@ -88,6 +88,12 @@ public class DisplayMessageActivity extends ListActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if(mList != null){ mList.clear(); }
+    }
+
     private class SoraDesc extends AsyncTask<String, Void, Void>
     {
         ProgressDialog mProgressDialog;
@@ -111,8 +117,6 @@ public class DisplayMessageActivity extends ListActivity {
                 Document sora = Jsoup.connect(urls[0]).get();
                 Element body = sora.body();
                 Elements tables = body.getElementsByAttributeValue("align", "right");
-
-                //mSoradata = new Soramame(40103120, "", "");
 
                 for( Element ta : tables)
                 {

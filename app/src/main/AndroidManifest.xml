@@ -36,10 +36,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.wada.myapplication.MainActivity" />
         </activity>
-        <activity
-            android:name=".GraphActivity"
-            android:label="@string/title_activity_graph" >
-        </activity>
     </application>
 
 </manifest>
