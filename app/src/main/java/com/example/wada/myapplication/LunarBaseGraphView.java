@@ -92,7 +92,7 @@ public class LunarBaseGraphView extends View {
             mBack.setColor(Color.argb(75, 0, 0, 255));
             mLine = new Paint();
             mLine.setColor(Color.argb(125, 0, 0, 0));
-            mLine.setStrokeWidth(3);
+            mLine.setStrokeWidth(4);
             mDot = new Paint();
             mDot.setColor(Color.argb(255, 255, 0, 0));
             mDot.setStrokeWidth(2);
@@ -151,6 +151,9 @@ public class LunarBaseGraphView extends View {
         int contentWidth = getWidth() - paddingLeft - paddingRight;
         int contentHeight = getHeight() - paddingTop - paddingBottom;
 
+        mExampleDimension = 32.0f;
+        invalidateTextPaintAndMeasurements();
+
         // グラフ描画
         // グラフ背景
         float y = (float)(paddingTop+contentHeight);
@@ -184,7 +187,7 @@ public class LunarBaseGraphView extends View {
         canvas.drawRect(mRect, mBack);
 
         // グラフ枠
-        mLine.setStrokeWidth(3);
+        mLine.setStrokeWidth(4);
         canvas.drawLine(paddingLeft, paddingTop + contentHeight, paddingLeft + contentWidth, paddingTop + contentHeight, mLine);
         canvas.drawLine( paddingLeft, paddingTop, paddingLeft, contentHeight+paddingTop, mLine );
         y = (float)(paddingTop+contentHeight);
@@ -192,6 +195,7 @@ public class LunarBaseGraphView extends View {
         for(int i=0; i<5; i++){
             y -= (float)contentHeight/5;
             canvas.drawLine( paddingLeft, y, paddingLeft+contentWidth, y, mLine );
+            canvas.drawText(String.format("%d", i*20+20), 0, y + mTextHeight/2, mTextPaint);
         }
 
         // グラフ
@@ -211,9 +215,12 @@ public class LunarBaseGraphView extends View {
                 }
                 // 時間軸描画
                 if( data.getDate().get(Calendar.HOUR_OF_DAY) == 0 ){
-                    canvas.drawLine( x, paddingTop, x, contentHeight+paddingTop, mLine );
+                    canvas.drawLine(x, paddingTop, x, contentHeight + paddingTop, mLine);
+                }
+                if( data.getDate().get(Calendar.HOUR_OF_DAY) == 1 ){
                     // 日付描画
-                    canvas.drawText(String.format("%02d日", data.getDate().get(Calendar.DAY_OF_MONTH)), x, paddingTop+mTextHeight, mTextPaint);
+                    canvas.drawText(String.format("%d日", data.getDate().get(Calendar.DAY_OF_MONTH)),
+                            x, paddingTop + contentHeight + mTextHeight, mTextPaint);
                 }
                 // リストにてクリックしたインデックスデータに描画<-ここを画像に切替える
                 if( nCount == mIndex){
@@ -232,6 +239,7 @@ public class LunarBaseGraphView extends View {
             mExampleString = String.format("PM2.5 最高値:%02d　μg/m3", mPM25Max);
         }
 
+//        mTextPaint.setTextSize(mExampleDimension);
         // Draw the text.
         canvas.drawText(mExampleString,
                 paddingLeft + (contentWidth - mTextWidth) / 2,
