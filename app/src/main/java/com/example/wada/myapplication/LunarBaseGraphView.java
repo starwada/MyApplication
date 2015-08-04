@@ -208,10 +208,15 @@ public class LunarBaseGraphView extends View {
 
             int nCount=0;
             float doty = 0f;
+            float fradius = 3.0f;
             for( Soramame.SoramameData data : list){
+                fradius = 3.0f;
                 doty = y - (data.getPM25() * (float)contentHeight / 100);
                 if( data.getPM25() > 0) {
-                    canvas.drawCircle(x, doty, 3, mDot);
+                    if( nCount == mIndex) {
+                        fradius = 12.0f;
+                    }
+                    canvas.drawCircle(x, doty, fradius, mDot);
                 }
                 // 時間軸描画
                 if( data.getDate().get(Calendar.HOUR_OF_DAY) == 0 ){
@@ -223,16 +228,16 @@ public class LunarBaseGraphView extends View {
                             x, paddingTop + contentHeight + mTextHeight, mTextPaint);
                 }
                 // リストにてクリックしたインデックスデータに描画<-ここを画像に切替える
-                if( nCount == mIndex){
-                    mVert[0]=x;
-                    mVert[1] = doty;
-                    mVert[2]=x+gap*2;
-                    mVert[3]=doty-30;
-                    mVert[4]=x-gap*2;
-                    mVert[5]=mVert[3];
-
-                    canvas.drawVertices(Canvas.VertexMode.TRIANGLES, 6, mVert, 0, null, 0,null,0,null,0,0, mDot);
-                }
+//                if( nCount == mIndex){
+//                    mVert[0]=x;
+//                    mVert[1] = doty;
+//                    mVert[2]=x+gap*2;
+//                    mVert[3]=doty-30;
+//                    mVert[4]=x-gap*2;
+//                    mVert[5]=mVert[3];
+//
+//                    canvas.drawVertices(Canvas.VertexMode.TRIANGLES, 6, mVert, 0, null, 0,null,0,null,0,0, mDot);
+//                }
                 nCount += 1;
                 x -= gap;
             }
