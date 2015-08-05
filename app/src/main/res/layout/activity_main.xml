@@ -3,45 +3,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-     <Spinner
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:id="@+id/spinner"
-    android:layout_centerHorizontal="true" />
-
     <TextView android:id="@+id/title_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/Title"
+        android:textSize="24sp"/>
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner"
+        android:layout_toRightOf="@+id/title_text"
+        android:layout_toEndOf="@+id/title_text" />
+
+    <TextView android:id="@+id/desc_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
         android:layout_below="@+id/spinner"
         android:gravity="center"/>
 
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/title_text"
-        android:text="測定局"
-        android:id="@+id/title_button" />
-
-    <TextView android:id="@+id/desc_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/title_button"
-        android:gravity="center"/>
-
-    <Button
-        android:id="@+id/desc_button"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="測定データ"
-        android:layout_below="@+id/desc_text"
-        android:onClick="sendMessage"/>
-
     <ListView
         android:id="@+id/sorastation"
-        android:layout_below="@+id/desc_button"
+        android:layout_below="@+id/desc_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
-
     </ListView>
 
 </RelativeLayout>

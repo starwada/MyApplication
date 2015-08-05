@@ -99,13 +99,13 @@ public class MainActivity extends ActionBarActivity {
 //            }
 //        });
 
-        Button descbutton = (Button)findViewById(R.id.desc_button);
-        descbutton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new Desc().execute();
-            }
-        });
+//        Button descbutton = (Button)findViewById(R.id.desc_button);
+//        descbutton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                new Desc().execute();
+//            }
+//        });
 
         ListView station = (ListView)findViewById(R.id.sorastation);
         station.setOnItemClickListener( new AdapterView.OnItemClickListener()
@@ -114,7 +114,6 @@ public class MainActivity extends ActionBarActivity {
             {
                 if(mList!=null) {
                     TextView desc_view = (TextView) findViewById(R.id.desc_text);
-//                desc_view.setText(String.format("%d", pos));
                     mSoramame = mList.get(pos);
                     desc_view.setText(mSoramame.getMstName());
 
@@ -159,7 +158,6 @@ public class MainActivity extends ActionBarActivity {
 
         super.onPause();
     }
-
 
     // 都道府県
     // 内部ストレージにファイル保存する
@@ -209,8 +207,11 @@ public class MainActivity extends ActionBarActivity {
         @Override
         protected void onPostExecute(Void result)
         {
-            ArrayAdapter<String> pref = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, prefList);
-            pref.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            // simple_spinner_itemはAndroidの初期設定
+//            ArrayAdapter<String> pref = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_item, prefList);
+//            pref.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            ArrayAdapter<String> pref = new ArrayAdapter<String>(MainActivity.this, R.layout.prefspinner_item, prefList);
+            pref.setDropDownViewResource(R.layout.prefspinner_drop_item);
             // スピナーリスト設定
             Spinner prefSpinner = (Spinner)findViewById(R.id.spinner);
             prefSpinner.setAdapter(pref);
@@ -334,7 +335,6 @@ public class MainActivity extends ActionBarActivity {
 
     private class Desc extends AsyncTask<Void, Void, Void>
     {
-
         @Override
         protected void onPreExecute()
         {
