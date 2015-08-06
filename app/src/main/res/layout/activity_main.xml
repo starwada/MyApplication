@@ -1,11 +1,14 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#BBDEFB">
 
     <TextView android:id="@+id/title_text"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignBottom="@+id/spinner"
+        android:gravity="center"
         android:text="@string/Title"
         android:textSize="24sp"/>
 
@@ -13,19 +16,32 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/spinner"
+        android:layout_marginLeft="@dimen/abc_action_bar_content_inset_material"
         android:layout_toRightOf="@+id/title_text"
         android:layout_toEndOf="@+id/title_text" />
 
-    <TextView android:id="@+id/desc_text"
-        android:layout_width="fill_parent"
+    <TextView android:id="@+id/desctitle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/title_text"
+        android:layout_alignEnd="@+id/title_text"
+        android:layout_alignRight="@+id/title_text"
+        android:gravity="center"
+        android:text="@string/desc"
+        android:textSize="24sp"/>
+
+    <TextView android:id="@+id/desc_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/abc_action_bar_content_inset_material"
         android:textSize="24sp"
         android:layout_below="@+id/spinner"
+        android:layout_toRightOf="@+id/desctitle"
         android:gravity="center"/>
 
     <ListView
         android:id="@+id/sorastation"
-        android:layout_below="@+id/desc_text"
+        android:layout_below="@+id/desctitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
     </ListView>

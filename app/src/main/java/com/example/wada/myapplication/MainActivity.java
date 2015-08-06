@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.provider.DocumentsContract;
 import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,7 +44,7 @@ import java.util.Locale;
 import com.example.wada.myapplication.Soramame;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
     private static final String SORAPREFFILE = "SoraPrefFile";
 
     private static  final  String SORABASEURL="http://soramame.taiki.go.jp/";
