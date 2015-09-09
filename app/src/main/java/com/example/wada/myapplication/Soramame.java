@@ -5,6 +5,7 @@ import android.os.Parcelable;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 
@@ -66,7 +67,8 @@ public class Soramame implements Parcelable{
 
         SoramameData(String strYear, String strMonth, String strDay, String strHour, String strValue)
         {
-            m_dDate = new GregorianCalendar(Integer.valueOf(strYear), Integer.valueOf(strMonth),
+            // 月は０から11で表現する。取得時も。
+            m_dDate = new GregorianCalendar(Integer.valueOf(strYear), Integer.valueOf(strMonth)-1,
                     Integer.valueOf(strDay), Integer.valueOf(strHour), 0);
             // 未計測の場合、"-"が出力される。他のパターンもあった。
 //            if( strValue.codePointAt(0) == 12288 || strValue.equalsIgnoreCase("-") ){ m_nPM25 = -100 ; }
@@ -81,7 +83,8 @@ public class Soramame implements Parcelable{
         }
 
         SoramameData(GregorianCalendar date, Integer nPM25){
-            m_dDate = new GregorianCalendar(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH), date.get(Calendar.HOUR_OF_DAY), 0, 0);
+            //m_dDate = new GregorianCalendar(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH), date.get(Calendar.HOUR_OF_DAY), 0, 0);
+            m_dDate = date ;
             m_nPM25 = nPM25;
         }
 
@@ -91,11 +94,11 @@ public class Soramame implements Parcelable{
         }
         public String getCalendarString(){
             return String.format("%s/%s/%s %s時",
-                    m_dDate.get(Calendar.YEAR), m_dDate.get(Calendar.MONTH), m_dDate.get(Calendar.DAY_OF_MONTH), m_dDate.get(Calendar.HOUR_OF_DAY));
+                    m_dDate.get(Calendar.YEAR), m_dDate.get(Calendar.MONTH)+1, m_dDate.get(Calendar.DAY_OF_MONTH), m_dDate.get(Calendar.HOUR_OF_DAY));
         }
         public String getDateString(){
             return String.format("%s/%s/%s",
-                    m_dDate.get(Calendar.YEAR), m_dDate.get(Calendar.MONTH), m_dDate.get(Calendar.DAY_OF_MONTH));
+                    m_dDate.get(Calendar.YEAR), m_dDate.get(Calendar.MONTH)+1, m_dDate.get(Calendar.DAY_OF_MONTH));
         }
         public String getHourString(){
             return String.format("%d時", m_dDate.get(Calendar.HOUR_OF_DAY));
