@@ -42,6 +42,9 @@ import java.util.ListIterator;
 import java.util.Locale;
 
 import com.example.wada.myapplication.Soramame;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdSize;
+import com.google.android.gms.ads.AdView;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -123,6 +126,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        AdView mAdView = (AdView)findViewById(R.id.adView);
+        mAdView.setAdSize(AdSize.SMART_BANNER);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
     }
 
     @Override
