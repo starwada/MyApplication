@@ -12,8 +12,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import org.jsoup.Jsoup;
@@ -97,6 +99,7 @@ public class DisplayMessageActivity extends ListActivity {
     private class SoraDesc extends AsyncTask<String, Void, Void>
     {
         ProgressDialog mProgressDialog;
+        int count = 0;
         @Override
         protected void onPreExecute()
         {
@@ -122,6 +125,7 @@ public class DisplayMessageActivity extends ListActivity {
                 {
                     Elements data = ta.getElementsByTag("td");
                     mSoradata.setData(data.get(0).text(), data.get(1).text(), data.get(2).text(), data.get(3).text(), data.get(14).text());
+                    count++;
                 }
             }
             catch(IOException e)
@@ -144,7 +148,15 @@ public class DisplayMessageActivity extends ListActivity {
             view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
             view.setData(mSoradata);
             mSoradata = null;
-
+//            ArrayList<String> dataList = new ArrayList<String>();
+//            dataList.add("PM2.5");
+//            dataList.add("SOX");
+//            ArrayAdapter<String> pref = new ArrayAdapter<String>(DisplayMessageActivity.this, android.R.layout.simple_spinner_item, dataList);
+//            pref.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//            // スピナーリスト設定
+//            Spinner prefSpinner = (Spinner)findViewById(R.id.spinner2);
+//            prefSpinner.setAdapter(pref);
+//            prefSpinner.setSelection(0);
             mProgressDialog.dismiss();
         }
     }

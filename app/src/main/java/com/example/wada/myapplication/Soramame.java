@@ -63,7 +63,16 @@ public class Soramame implements Parcelable{
     // そらまめの測定データクラス
     public class SoramameData {
         private GregorianCalendar m_dDate;       // 測定日時 UTCのみのようだ
-        private Integer m_nPM25;    // PM2.5測定値 未計測は-100を設定
+        // SO2 ppm 二酸化硫黄
+        // NO ppm 一酸化窒素
+        // NO2 ppm 二酸化窒素
+        // NOX ppm 窒素酸化物
+        // CO ppm 一酸化炭素
+        // OX ppm 光化学オキシダント
+        // SPM mg/m3 浮遊粒子状物質
+        private Integer m_nPM25;    // μg/m3 微小粒子状物質 PM2.5測定値 未計測は-100を設定
+        // WD 16方位(静穏) 風向
+        // WS m/s 風速
 
         SoramameData(String strYear, String strMonth, String strDay, String strHour, String strValue)
         {

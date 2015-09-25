@@ -9,7 +9,10 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -99,6 +102,16 @@ public class LunarBaseGraphView extends View {
             mRect = new RectF();
             mVert = new float[6];
             mIndex = 0;
+
+//            ArrayList<String> dataList = new ArrayList<String>();
+//            dataList.add("PM2.5");
+//            dataList.add("SOX");
+//            ArrayAdapter<String> pref = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, dataList);
+//            pref.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//            // スピナーリスト設定
+//            Spinner prefSpinner = (Spinner)findViewById(R.id.spinner2);
+//            prefSpinner.setAdapter(pref);
+//            prefSpinner.setSelection(0);
         }
         catch(java.lang.NullPointerException e){
             e.getMessage();
@@ -127,6 +140,7 @@ public class LunarBaseGraphView extends View {
             if( data.getPM25() > mPM25Max ){ mPM25Max = data.getPM25(); }
             mSoramame.setData(data);
         }
+
         // 再描画
         invalidate();
     }

@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
 
                 mPref = position + 1;
 
-                new Title().execute();
+                new SoraStation().execute();
             }
 
             @Override
@@ -126,8 +126,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // 広告ビュー
         AdView mAdView = (AdView)findViewById(R.id.adView);
-        mAdView.setAdSize(AdSize.SMART_BANNER);
+        //mAdView.setAdSize(AdSize.SMART_BANNER);
         AdRequest adRequest = new AdRequest.Builder().build();
         mAdView.loadAd(adRequest);
     }
@@ -259,7 +260,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // 都道府県の測定局データ取得
-    private class Title extends AsyncTask<Void, Void, Void>
+    private class SoraStation extends AsyncTask<Void, Void, Void>
     {
         String url;
 
@@ -341,6 +342,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // 測定局データ取得
     private class Desc extends AsyncTask<Void, Void, Void>
     {
         @Override
