@@ -66,6 +66,16 @@ public class DisplayMessageActivity extends ListActivity {
                 graph.setPos(position);
             }
         });
+
+//        ArrayList<String> dataList = new ArrayList<String>();
+//        dataList.add("PM2.5");
+//        dataList.add("SOX");
+//        ArrayAdapter<String> pref = new ArrayAdapter<String>(DisplayMessageActivity.this, android.R.layout.simple_spinner_item, dataList);
+//        pref.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+//        // スピナーリスト設定
+//        Spinner prefSpinner = (Spinner)findViewById(R.id.spinner2);
+//        prefSpinner.setAdapter(pref);
+//        prefSpinner.setSelection(0);
     }
 
     @Override
@@ -124,7 +134,11 @@ public class DisplayMessageActivity extends ListActivity {
                 for( Element ta : tables)
                 {
                     Elements data = ta.getElementsByTag("td");
-                    mSoradata.setData(data.get(0).text(), data.get(1).text(), data.get(2).text(), data.get(3).text(), data.get(14).text());
+                    // 0 西暦/1 月/2 日/3 時間
+                    // 4 SO2/5 NO/6 NO2/7 NOX/8 CO/9 OX/10 NMHC/11 CH4/12 THC/13 SPM/14 PM2.5/15 SP/16 WD/17 WS
+
+                    mSoradata.setData(data.get(0).text(), data.get(1).text(), data.get(2).text(), data.get(3).text(),
+                            data.get(9).text(), data.get(14).text());
                     count++;
                 }
             }
@@ -148,15 +162,17 @@ public class DisplayMessageActivity extends ListActivity {
             view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
             view.setData(mSoradata);
             mSoradata = null;
-//            ArrayList<String> dataList = new ArrayList<String>();
-//            dataList.add("PM2.5");
-//            dataList.add("SOX");
-//            ArrayAdapter<String> pref = new ArrayAdapter<String>(DisplayMessageActivity.this, android.R.layout.simple_spinner_item, dataList);
-//            pref.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//            // スピナーリスト設定
-//            Spinner prefSpinner = (Spinner)findViewById(R.id.spinner2);
-//            prefSpinner.setAdapter(pref);
-//            prefSpinner.setSelection(0);
+            ArrayList<String> dataList = new ArrayList<String>();
+            dataList.add("PM2.5");
+            dataList.add("SOX");
+            dataList.add("NOX");
+            ArrayAdapter<String> pref = new ArrayAdapter<String>(DisplayMessageActivity.this, android.R.layout.simple_spinner_item, dataList);
+            pref.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            // スピナーリスト設定
+            Spinner prefSpinner = (Spinner)findViewById(R.id.spinner2);
+            prefSpinner.setAdapter(pref);
+            prefSpinner.setSelection(0);
+
             mProgressDialog.dismiss();
         }
     }

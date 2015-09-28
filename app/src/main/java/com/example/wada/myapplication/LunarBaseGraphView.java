@@ -38,7 +38,10 @@ public class LunarBaseGraphView extends View {
     private Paint mLine ;
     private Paint mDot ;
     private RectF mRect;
-    private float[] mVert;
+//    private float[] mVert;
+
+    private Paint mOX;
+//    private float[] mOXLines;
 
     private int mIndex;
 
@@ -100,18 +103,12 @@ public class LunarBaseGraphView extends View {
             mDot.setColor(Color.argb(255, 255, 0, 0));
             mDot.setStrokeWidth(2);
             mRect = new RectF();
-            mVert = new float[6];
+//            mVert = new float[6];
             mIndex = 0;
-
-//            ArrayList<String> dataList = new ArrayList<String>();
-//            dataList.add("PM2.5");
-//            dataList.add("SOX");
-//            ArrayAdapter<String> pref = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_item, dataList);
-//            pref.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//            // スピナーリスト設定
-//            Spinner prefSpinner = (Spinner)findViewById(R.id.spinner2);
-//            prefSpinner.setAdapter(pref);
-//            prefSpinner.setSelection(0);
+            // OX用のペイント情報
+            mOX = new Paint();
+            mOX.setColor(Color.argb(75, 255, 0, 0));
+            mOX.setStrokeWidth(2.4f);
         }
         catch(java.lang.NullPointerException e){
             e.getMessage();
@@ -223,6 +220,7 @@ public class LunarBaseGraphView extends View {
             int nCount=0;
             float doty = 0f;
             float fradius = 3.0f;
+            float fOXY[] = { 0.0f, 0.0f  };
             for( Soramame.SoramameData data : list){
                 fradius = 3.0f;
                 doty = y - (data.getPM25() * (float)contentHeight / 100);
@@ -254,11 +252,17 @@ public class LunarBaseGraphView extends View {
 //                }
                 nCount += 1;
                 x -= gap;
+                fOXY[1] = fOXY[0];
+                // PM2.5 70以上で赤 OXは0.24
+                fOXY[0] = y-((data.getOX()/0.24f) * (float)contentHeight * 0.7f );
+                if( nCount > 1){
+                    canvas.drawLine(x, fOXY[0], x+gap, fOXY[1], mOX);
+                }
             }
-            mExampleString = String.format("PM2.5 最高値:%02d　μg/m3", mPM25Max);
+            mExampleString = String.format("PM2.5 最高値:%02d μg/m3", mPM25Max);
         }
 
-//        mTextPaint.setTextSize(mExampleDimension);
+        mTextPaint.setTextSize(60.0f);
         // Draw the text.
         canvas.drawText(mExampleString,
                 paddingLeft + (contentWidth - mTextWidth) / 2,

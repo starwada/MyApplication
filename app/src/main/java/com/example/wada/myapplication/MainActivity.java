@@ -126,6 +126,18 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+//        station.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//                if(mList!=null) {
+//                    TextView desc_view = (TextView) findViewById(R.id.desc_text);
+//                    mSoramame = mList.get(position);
+//                    desc_view.setText(mSoramame.getMstName());
+//                }
+//                return false;
+//            }
+//        });
+
         // 広告ビュー
         AdView mAdView = (AdView)findViewById(R.id.adView);
         //mAdView.setAdSize(AdSize.SMART_BANNER);

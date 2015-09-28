@@ -68,13 +68,13 @@ public class Soramame implements Parcelable{
         // NO2 ppm 二酸化窒素
         // NOX ppm 窒素酸化物
         // CO ppm 一酸化炭素
-        // OX ppm 光化学オキシダント
+        private float m_fOX;// OX ppm 光化学オキシダント
         // SPM mg/m3 浮遊粒子状物質
         private Integer m_nPM25;    // μg/m3 微小粒子状物質 PM2.5測定値 未計測は-100を設定
-        // WD 16方位(静穏) 風向
-        // WS m/s 風速
+        private Integer m_nWD;  // WD 16方位(静穏) 風向 静穏は0、北を1として、時計回りに
+        private float m_fWS;      // WS m/s 風速
 
-        SoramameData(String strYear, String strMonth, String strDay, String strHour, String strValue)
+        SoramameData(String strYear, String strMonth, String strDay, String strHour, String strOX, String strPM25)
         {
             // 月は０から11で表現する。取得時も。
             m_dDate = new GregorianCalendar(Integer.valueOf(strYear), Integer.valueOf(strMonth)-1,
@@ -83,17 +83,21 @@ public class Soramame implements Parcelable{
 //            if( strValue.codePointAt(0) == 12288 || strValue.equalsIgnoreCase("-") ){ m_nPM25 = -100 ; }
 //            else{ m_nPM25 = Integer.valueOf(strValue); }
             try{
-                m_nPM25 = Integer.parseInt(strValue);
+                m_fOX = Float.parseFloat(strOX);
+                m_nPM25 = Integer.parseInt(strPM25);
             }
             catch(NumberFormatException e){
+                // これだとどちらかが例外でどちらもエラー値となってしまう。
                 e.getMessage();
+                m_fOX = -0.1f;
                 m_nPM25 = -100;
             }
         }
 
-        SoramameData(GregorianCalendar date, Integer nPM25){
+        SoramameData(GregorianCalendar date, float fOX, Integer nPM25){
             //m_dDate = new GregorianCalendar(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH), date.get(Calendar.HOUR_OF_DAY), 0, 0);
             m_dDate = date ;
+            m_fOX = fOX;
             m_nPM25 = nPM25;
         }
 
@@ -112,6 +116,7 @@ public class Soramame implements Parcelable{
         public String getHourString(){
             return String.format("%d時", m_dDate.get(Calendar.HOUR_OF_DAY));
         }
+        public float getOX(){ return m_fOX; }
         public  Integer getPM25()
         {
             return (m_nPM25 < 0 ? 0 : m_nPM25);
@@ -129,7 +134,7 @@ public class Soramame implements Parcelable{
         }
     }
 
-    private SoramameStation m_Station;
+    private SoramameStation m_Station;                  // 測定局データ
     private ArrayList< SoramameData > m_aData;  // 測定データ
 
     @Override
@@ -181,14 +186,14 @@ public class Soramame implements Parcelable{
         return m_Station.getAddress();
     }
 
-    public void setData(String strYear, String strMonth, String strDay, String strHour, String strValue)
+    public void setData(String strYear, String strMonth, String strDay, String strHour, String strOX, String strPM25)
     {
-        SoramameData data = new SoramameData(strYear, strMonth, strDay, strHour, strValue);
+        SoramameData data = new SoramameData(strYear, strMonth, strDay, strHour, strOX, strPM25);
         addData(data);
     }
 
     public void setData(SoramameData orig){
-        SoramameData data = new SoramameData(orig.getDate(), orig.getPM25());
+        SoramameData data = new SoramameData(orig.getDate(), orig.getOX(), orig.getPM25());
         addData(data);
     }
 

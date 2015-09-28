@@ -16,9 +16,16 @@
         android:id="@+id/MstName"
         />
 
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/spinner2"
+        android:layout_below="@+id/MstName"
+        android:layout_gravity="center" />
+
     <com.example.wada.myapplication.LunarBaseGraphView
         android:id="@+id/soragraph"
-        android:layout_below="@+id/MstName"
+        android:layout_below="@+id/spinner2"
         android:background="#ccc"
         android:layout_width="fill_parent"
         android:layout_height="300dp"
