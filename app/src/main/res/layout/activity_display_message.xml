@@ -16,11 +16,18 @@
         android:id="@+id/MstName"
         />
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="大気汚染物質"
+        android:id="@+id/comment"
+        android:layout_below="@+id/MstName"/>
     <Spinner
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/spinner2"
         android:layout_below="@+id/MstName"
+        android:layout_toRightOf="@+id/comment"
         android:layout_gravity="center" />
 
     <com.example.wada.myapplication.LunarBaseGraphView
