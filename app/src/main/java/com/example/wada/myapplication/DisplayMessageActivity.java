@@ -138,7 +138,7 @@ public class DisplayMessageActivity extends ListActivity {
                     // 4 SO2/5 NO/6 NO2/7 NOX/8 CO/9 OX/10 NMHC/11 CH4/12 THC/13 SPM/14 PM2.5/15 SP/16 WD/17 WS
 
                     mSoradata.setData(data.get(0).text(), data.get(1).text(), data.get(2).text(), data.get(3).text(),
-                            data.get(9).text(), data.get(14).text());
+                            data.get(9).text(), data.get(14).text(), data.get(16).text(), data.get(17).text());
                     count++;
                 }
             }

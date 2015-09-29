@@ -8,7 +8,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-
 /**
  * そらまめデータ
  * Intentで渡せるようにParcelableを使用
@@ -74,7 +73,7 @@ public class Soramame implements Parcelable{
         private Integer m_nWD;  // WD 16方位(静穏) 風向 静穏は0、北を1として、時計回りに
         private float m_fWS;      // WS m/s 風速
 
-        SoramameData(String strYear, String strMonth, String strDay, String strHour, String strOX, String strPM25)
+        SoramameData(String strYear, String strMonth, String strDay, String strHour, String strOX, String strPM25, String strWD, String strWS)
         {
             // 月は０から11で表現する。取得時も。
             m_dDate = new GregorianCalendar(Integer.valueOf(strYear), Integer.valueOf(strMonth)-1,
@@ -85,20 +84,26 @@ public class Soramame implements Parcelable{
             try{
                 m_fOX = Float.parseFloat(strOX);
                 m_nPM25 = Integer.parseInt(strPM25);
+                m_nWD = parseWD(strWD);
+                m_fWS = Float.parseFloat(strWS);
             }
             catch(NumberFormatException e){
                 // これだとどちらかが例外でどちらもエラー値となってしまう。
                 e.getMessage();
                 m_fOX = -0.1f;
                 m_nPM25 = -100;
+                m_nWD = -1;
+                m_fWS = 0.0f;
             }
         }
 
-        SoramameData(GregorianCalendar date, float fOX, Integer nPM25){
+        SoramameData(GregorianCalendar date, float fOX, Integer nPM25, Integer nWD, float fWS){
             //m_dDate = new GregorianCalendar(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH), date.get(Calendar.HOUR_OF_DAY), 0, 0);
             m_dDate = date ;
             m_fOX = fOX;
             m_nPM25 = nPM25;
+            m_nWD = nWD;
+            m_fWS = fWS;
         }
 
         public GregorianCalendar getDate()
@@ -122,6 +127,8 @@ public class Soramame implements Parcelable{
             return (m_nPM25 < 0 ? 0 : m_nPM25);
         }
         public String getPM25String(){ return String.format("%s",(m_nPM25 < 0 ? "未計測" : m_nPM25.toString()));}
+        public Integer getWD(){ return m_nWD; }
+        public float getWS(){ return m_fWS; }
 
         public void setPM25(Integer pm25)
         {
@@ -186,14 +193,14 @@ public class Soramame implements Parcelable{
         return m_Station.getAddress();
     }
 
-    public void setData(String strYear, String strMonth, String strDay, String strHour, String strOX, String strPM25)
+    public void setData(String strYear, String strMonth, String strDay, String strHour, String strOX, String strPM25, String strWD, String strWS)
     {
-        SoramameData data = new SoramameData(strYear, strMonth, strDay, strHour, strOX, strPM25);
+        SoramameData data = new SoramameData(strYear, strMonth, strDay, strHour, strOX, strPM25, strWD, strWS);
         addData(data);
     }
 
     public void setData(SoramameData orig){
-        SoramameData data = new SoramameData(orig.getDate(), orig.getOX(), orig.getPM25());
+        SoramameData data = new SoramameData(orig.getDate(), orig.getOX(), orig.getPM25(), orig.getWD(), orig.getWS());
         addData(data);
     }
 
@@ -229,5 +236,68 @@ public class Soramame implements Parcelable{
     public ArrayList<SoramameData> getData()
     {
         return m_aData;
+    }
+
+    public Integer parseWD(String strWD){
+        Integer nWD = -1;
+        int start = 0;
+        do {
+            if (strWD.startsWith("北", start)) {
+                // 東北東、西北西
+                if(start == 1){
+                    if(nWD == 5){ nWD = 4; }
+                    else if(nWD == 13){ nWD = 14; }
+                }
+                else{
+                    nWD = 1;
+                }
+            } else if (strWD.startsWith("南", start)) {
+                // 東南東、西南西
+                if(start == 1){
+                    if(nWD == 5){ nWD = 6; }
+                    else if(nWD == 13){ nWD = 12; }
+                }
+                else {
+                    nWD = 9;
+                }
+            }
+            else if(strWD.startsWith("東", start)){
+                // 北東、南東
+                if(start == 1){
+                    if(nWD == 1){ nWD = 3; }
+                    else{ nWD = 7; }
+                }
+                // 北北東、南南東
+                else if(start == 2){
+                    if(nWD == 1){ nWD = 2; }
+                    else if(nWD == 9){ nWD = 8; }
+                }
+                else {
+                    nWD = 5;
+                }
+            }
+            else if(strWD.startsWith("西", start)){
+                // 北西、南西
+                if(start == 1){
+                    if(nWD == 1){ nWD = 15; }
+                    else{ nWD = 11; }
+                }
+                // 北北西、南南西
+                else if(start == 2){
+                    if(nWD == 1){ nWD = 16; }
+                    else if(nWD == 9){ nWD = 10; }
+                }
+                else {
+                    nWD = 13;
+                }
+            }
+            // 静穏
+            else{
+                nWD = 0;
+                break ;
+            }
+        }while(strWD.length() > ++start);
+
+        return nWD;
     }
 }

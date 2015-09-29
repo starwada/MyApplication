@@ -254,9 +254,10 @@ public class LunarBaseGraphView extends View {
                 x -= gap;
                 fOXY[1] = fOXY[0];
                 // PM2.5 70以上で赤 OXは0.24
-                fOXY[0] = y-((data.getOX()/0.24f) * (float)contentHeight * 0.7f );
+                //fOXY[0] = y-((data.getOX()/0.24f) * (float)contentHeight * 0.7f );
+                fOXY[0] = doty;
                 if( nCount > 1){
-                    canvas.drawLine(x, fOXY[0], x+gap, fOXY[1], mOX);
+                    canvas.drawLine(x+gap, fOXY[0], x+gap+gap, fOXY[1], mOX);
                 }
             }
             mExampleString = String.format("PM2.5 最高値:%02d μg/m3", mPM25Max);
