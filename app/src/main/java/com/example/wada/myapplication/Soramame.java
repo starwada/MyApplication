@@ -81,19 +81,23 @@ public class Soramame implements Parcelable{
             // 未計測の場合、"-"が出力される。他のパターンもあった。
 //            if( strValue.codePointAt(0) == 12288 || strValue.equalsIgnoreCase("-") ){ m_nPM25 = -100 ; }
 //            else{ m_nPM25 = Integer.valueOf(strValue); }
+            m_fOX = -0.1f;
+            m_nPM25 = -100;
+            m_nWD = -1;
+            m_fWS = 0.0f;
             try{
-                m_fOX = Float.parseFloat(strOX);
-                m_nPM25 = Integer.parseInt(strPM25);
+                // データを取得できる確率が高い順
                 m_nWD = parseWD(strWD);
+                m_nPM25 = Integer.parseInt(strPM25);
+                m_fOX = Float.parseFloat(strOX);
                 m_fWS = Float.parseFloat(strWS);
             }
             catch(NumberFormatException e){
-                // これだとどちらかが例外でどちらもエラー値となってしまう。
                 e.getMessage();
-                m_fOX = -0.1f;
-                m_nPM25 = -100;
-                m_nWD = -1;
-                m_fWS = 0.0f;
+//                m_fOX = -0.1f;
+//                m_nPM25 = -100;
+//                m_nWD = -1;
+//                m_fWS = 0.0f;
             }
         }
 
@@ -184,8 +188,7 @@ public class Soramame implements Parcelable{
     {
         return m_Station.getCode();
     }
-    public String getMstName()
-    {
+    public String getMstName() {
         return m_Station.getName();
     }
     public String getAddress()

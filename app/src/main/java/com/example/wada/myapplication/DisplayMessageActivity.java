@@ -66,16 +66,6 @@ public class DisplayMessageActivity extends ListActivity {
                 graph.setPos(position);
             }
         });
-
-//        ArrayList<String> dataList = new ArrayList<String>();
-//        dataList.add("PM2.5");
-//        dataList.add("SOX");
-//        ArrayAdapter<String> pref = new ArrayAdapter<String>(DisplayMessageActivity.this, android.R.layout.simple_spinner_item, dataList);
-//        pref.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-//        // スピナーリスト設定
-//        Spinner prefSpinner = (Spinner)findViewById(R.id.spinner2);
-//        prefSpinner.setAdapter(pref);
-//        prefSpinner.setSelection(0);
     }
 
     @Override
