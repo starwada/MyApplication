@@ -20,6 +20,7 @@ public class Soramame implements Parcelable{
         private int m_nCode;                // 測定局コード
         private String m_strName;       // 測定局名称
         private String m_strAddress;    // 住所
+        private boolean m_bAllow[] = {false, false, false};     // 取得データフラグ（OX、PM2.5、風向）
 
         public SoramameStation(int nCode, String strName, String strAddress)
         {
@@ -27,10 +28,9 @@ public class Soramame implements Parcelable{
             setName(strName);
             setAddress(strAddress);
         }
-        public void setCode(int nCode)
-        {
-            m_nCode = nCode;
-        }
+
+        // Set
+        public void setCode(int nCode){ m_nCode = nCode; }
         public void setName(String strName)
         {
             m_strName = strName;
@@ -39,7 +39,9 @@ public class Soramame implements Parcelable{
         {
             m_strAddress = strAddress;
         }
+        public void setAllow( boolean bAllow[] ){ m_bAllow = bAllow; }
 
+        // Get
         public int getCode()
         {
             return m_nCode;
@@ -57,6 +59,8 @@ public class Soramame implements Parcelable{
 //            return String.format("%d %s:%s", m_nCode, m_strName, m_strAddress);
             return String.format("%s:%s", m_strName, m_strAddress);
         }
+        public boolean[] getAllow(){ return m_bAllow; }
+        public boolean getAllowOX(){ return m_bAllow[0]; }
     }
 
     // そらまめの測定データクラス
@@ -93,7 +97,7 @@ public class Soramame implements Parcelable{
                 m_fWS = Float.parseFloat(strWS);
             }
             catch(NumberFormatException e){
-                e.getMessage();
+                e.printStackTrace();
 //                m_fOX = -0.1f;
 //                m_nPM25 = -100;
 //                m_nWD = -1;
@@ -153,10 +157,12 @@ public class Soramame implements Parcelable{
         return 0;
     }
 
+    // Parcel(小包)用、IntentにてMainActivityからDisplayMessageActivityへデータを渡すため
     public void writeToParcel(Parcel out, int flags) {
         out.writeInt(m_Station.getCode());
         out.writeString(m_Station.getName());
         out.writeString(m_Station.getAddress());
+        out.writeBooleanArray(m_Station.getAllow());
     }
 
     public static final Parcelable.Creator<Soramame> CREATOR
@@ -169,12 +175,16 @@ public class Soramame implements Parcelable{
             return new Soramame[size];
         }
     };
+
     public Soramame(){
         super();
     }
 
     private Soramame(Parcel in) {
         m_Station = new SoramameStation(in.readInt(), in.readString(), in.readString());
+        boolean bFlag[] = new boolean[3];
+        in.readBooleanArray(bFlag);
+        m_Station.setAllow(bFlag);
         m_aData  = null;
     }
 
@@ -196,6 +206,7 @@ public class Soramame implements Parcelable{
         return m_Station.getAddress();
     }
 
+    // Set
     public void setData(String strYear, String strMonth, String strDay, String strHour, String strOX, String strPM25, String strWD, String strWS)
     {
         SoramameData data = new SoramameData(strYear, strMonth, strDay, strHour, strOX, strPM25, strWD, strWS);
@@ -205,6 +216,21 @@ public class Soramame implements Parcelable{
     public void setData(SoramameData orig){
         SoramameData data = new SoramameData(orig.getDate(), orig.getOX(), orig.getPM25(), orig.getWD(), orig.getWS());
         addData(data);
+    }
+
+    public void setAllow(String strOX, String strPM25, String strWD){
+        boolean flag[] = new boolean[3];
+        int code[] = new int[3];
+        code[0] = strOX.codePointAt(0);
+        code[1] = strPM25.codePointAt(0);
+        code[2] = strWD.codePointAt(0);
+        for(int i=0; i<3; i++){
+            flag[i] = false;
+            if(code[i] == 9675){
+                flag[i] = true;
+            }
+        }
+        m_Station.setAllow(flag);
     }
 
     public void clearData(){
@@ -241,6 +267,8 @@ public class Soramame implements Parcelable{
         return m_aData;
     }
 
+    // 風向文字列->インデックス変換
+    // 静穏 0/北 1/北北東 2/北東 3 -> 北北西 16
     public Integer parseWD(String strWD){
         Integer nWD = -1;
         int start = 0;

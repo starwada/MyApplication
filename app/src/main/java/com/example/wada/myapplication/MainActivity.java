@@ -275,6 +275,9 @@ public class MainActivity extends AppCompatActivity {
     private class SoraStation extends AsyncTask<Void, Void, Void>
     {
         String url;
+        String strOX;           // OX
+        String strPM25;     // PM2.5
+        String strWD;       // 風向
 
         @Override
         protected void onPreExecute()
@@ -314,17 +317,20 @@ public class MainActivity extends AppCompatActivity {
                         for( Element ta : tables) {
                             if( cnt++ > 0) {
                                 Elements data = ta.getElementsByTag("td");
-                                String kyoku = data.get(13).text();
+                                // 測定対象取得 OX(8)、PM2.5(13)、風向(15)
+                                // 想定は○か✕
+                                strOX = data.get(8).text();
+                                strPM25 = data.get(13).text();
+                                strWD = data.get(15).text();
                                 // 最後のデータが空なので
-                                if(kyoku.length() < 1)
-                                {
-                                    break;
-                                }
-                                int nCode = kyoku.codePointAt(0);
-                                // PM2.5測定局のみ
-                                if( nCode == 9675 ) {
-                                    mList.add( new Soramame(Integer.parseInt(data.get(0).text()), data.get(1).text(), data.get(2).text()));
+                                if(strPM25.length() < 1){ break; }
 
+                                int nCode = strPM25.codePointAt(0);
+                                // PM2.5測定局のみ ○のコード(9675)
+                                if( nCode == 9675 ) {
+                                    Soramame ent = new Soramame(Integer.parseInt(data.get(0).text()), data.get(1).text(), data.get(2).text());
+                                    ent.setAllow(strOX, strPM25, strWD);
+                                    mList.add(ent);
                                 }
                             }
                         }
