@@ -33,7 +33,7 @@ public class LunarBaseGraphView extends View {
     private float mTextHeight;
 
     private Soramame mSoramame;     // 測定局のPM2.5データ
-    private int mPM25Max;
+    private int mMax;                           // 表示データのMAX
     private Paint mBack;
     private Paint mLine ;
     private Paint mDot ;
@@ -43,7 +43,8 @@ public class LunarBaseGraphView extends View {
     private Paint mOX;
 //    private float[] mOXLines;
 
-    private int mIndex;
+    private int mIndex;                     // 強調日時インデックス
+    private int mMode;                      // 表示データモード 0 PM2.5/1 OX
 
     public LunarBaseGraphView(Context context) {
         super(context);
@@ -93,7 +94,7 @@ public class LunarBaseGraphView extends View {
             // Update TextPaint and text measurements from attributes
             invalidateTextPaintAndMeasurements();
 
-            mPM25Max = 0;
+            mMax = 0;
             mBack = new Paint();
             mBack.setColor(Color.argb(75, 0, 0, 255));
             mLine = new Paint();
@@ -105,6 +106,7 @@ public class LunarBaseGraphView extends View {
             mRect = new RectF();
 //            mVert = new float[6];
             mIndex = 0;
+            mMode = 0;
             // OX用のペイント情報
             mOX = new Paint();
             mOX.setColor(Color.argb(75, 255, 0, 0));
@@ -130,11 +132,11 @@ public class LunarBaseGraphView extends View {
         if(mSoramame != null){ mSoramame = null; }
         if( sora.getSize() < 1 ){ return ; }
 
-        mPM25Max = 0;
+        mMax = 0;
         mSoramame = new Soramame(sora.getMstCode(), sora.getMstName(), sora.getAddress());
         ArrayList<Soramame.SoramameData> list = sora.getData();
         for( Soramame.SoramameData data : list){
-            if( data.getPM25() > mPM25Max ){ mPM25Max = data.getPM25(); }
+            if( data.getPM25() > mMax ){ mMax = data.getPM25(); }
             mSoramame.setData(data);
         }
 
@@ -142,8 +144,15 @@ public class LunarBaseGraphView extends View {
         invalidate();
     }
 
+    // 強調日時設定
     public void setPos(int position){
         mIndex = position;
+        invalidate();
+    }
+
+    // 表示データ設定
+    public void setMode(int mode){
+        mMode = mode;
         invalidate();
     }
 
@@ -223,7 +232,15 @@ public class LunarBaseGraphView extends View {
             float fOXY[] = { 0.0f, 0.0f  };
             for( Soramame.SoramameData data : list){
                 fradius = 3.0f;
-                doty = y - (data.getPM25() * (float)contentHeight / 100);
+                switch(mMode){
+                    case 0:
+                        doty = y - (data.getPM25() * (float)contentHeight / 100);
+                        break;
+                    case 1:
+                        doty = y-((data.getOX()/0.24f) * (float)contentHeight * 0.7f );
+                        break;
+                }
+
                 if( data.getPM25() > 0) {
                     if( nCount == mIndex) {
                         fradius = 12.0f;
@@ -260,7 +277,7 @@ public class LunarBaseGraphView extends View {
                     canvas.drawLine(x+gap, fOXY[0], x+gap+gap, fOXY[1], mOX);
                 }
             }
-            mExampleString = String.format("PM2.5 最高値:%02d μg/m3", mPM25Max);
+            mExampleString = String.format("PM2.5 最高値:%02d μg/m3", mMax);
         }
 
         mTextPaint.setTextSize(60.0f);

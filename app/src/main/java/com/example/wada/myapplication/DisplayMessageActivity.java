@@ -66,6 +66,20 @@ public class DisplayMessageActivity extends ListActivity {
                 graph.setPos(position);
             }
         });
+
+        // 表示データ種別の設定
+        Spinner spinner = (Spinner)findViewById(R.id.spinner2);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                LunarBaseGraphView graph = (LunarBaseGraphView) findViewById(R.id.soragraph);
+                graph.setMode(position);
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     @Override
@@ -106,7 +120,7 @@ public class DisplayMessageActivity extends ListActivity {
             super.onPreExecute();
             mSoradata.clearData();
             mProgressDialog = new ProgressDialog(DisplayMessageActivity.this);
-            mProgressDialog.setTitle( "そらまめ PM2.5データ取得");
+            mProgressDialog.setTitle( "そらまめ データ取得");
             mProgressDialog.setMessage("Loading...");
             mProgressDialog.setIndeterminate(false);
             mProgressDialog.show();
@@ -152,10 +166,11 @@ public class DisplayMessageActivity extends ListActivity {
             view.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
             view.setData(mSoradata);
             mSoradata = null;
+
+            //
             ArrayList<String> dataList = new ArrayList<String>();
             dataList.add("PM2.5");
-            dataList.add("SOX");
-            dataList.add("NOX");
+            dataList.add("OX(光化学オキシダント)");
             ArrayAdapter<String> pref = new ArrayAdapter<String>(DisplayMessageActivity.this, android.R.layout.simple_spinner_item, dataList);
             pref.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             // スピナーリスト設定

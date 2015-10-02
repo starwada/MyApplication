@@ -52,7 +52,8 @@ public class Soramame implements Parcelable{
         }
         public String getAddress()
         {
-            return m_strAddress;
+            //return m_strAddress;
+            return String.format("%s:OX(%s)PM2.5(%s)WD(%s)", m_strAddress, (m_bAllow[0] ? "○" : "×"),(m_bAllow[1] ? "○" : "×"),(m_bAllow[2] ? "○" : "×") );
         }
         public String getString()
         {

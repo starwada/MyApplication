@@ -327,11 +327,11 @@ public class MainActivity extends AppCompatActivity {
 
                                 int nCode = strPM25.codePointAt(0);
                                 // PM2.5測定局のみ ○のコード(9675)
-                                if( nCode == 9675 ) {
+                                //if( nCode == 9675 ) {
                                     Soramame ent = new Soramame(Integer.parseInt(data.get(0).text()), data.get(1).text(), data.get(2).text());
                                     ent.setAllow(strOX, strPM25, strWD);
                                     mList.add(ent);
-                                }
+                                //}
                             }
                         }
                     }
