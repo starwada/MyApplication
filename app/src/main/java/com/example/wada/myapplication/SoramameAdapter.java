@@ -27,10 +27,17 @@ class ViewHolder
  */
 public class SoramameAdapter extends ArrayAdapter<Soramame.SoramameData> {
     private LayoutInflater mInflater;
+    private int mMode;      // 表示データモード 0 PM2.5/1 OX/2 風速（WS）
 
     public SoramameAdapter(Context context, List<Soramame.SoramameData> objects){
         super(context, 0, objects);
         mInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mMode = 0;
+    }
+
+    // 表示モード設定
+    public void setMode(int mode){
+        mMode = mode;
     }
 
     public View getView(int position, View convertView, ViewGroup parent)
@@ -54,7 +61,17 @@ public class SoramameAdapter extends ArrayAdapter<Soramame.SoramameData> {
         Soramame.SoramameData data = getItem(position);
         holder.date.setText(data.getDateString());
         holder.hour.setText(data.getHourString());
-        holder.value.setText(data.getPM25String());
+        switch(mMode){
+            case 0:
+                holder.value.setText(data.getPM25String());
+                break;
+            case 1:
+                holder.value.setText(data.getOXString());
+                break;
+            case 2:
+                holder.value.setText(data.getWSString());
+                break;
+        }
 
         return convertView;
     }

@@ -16,52 +16,70 @@ import java.util.GregorianCalendar;
 public class Soramame implements Parcelable{
 
     // そらまめの測定局データ
-    public  class SoramameStation{
+    public  class SoramameStation {
         private int m_nCode;                // 測定局コード
         private String m_strName;       // 測定局名称
         private String m_strAddress;    // 住所
         private boolean m_bAllow[] = {false, false, false};     // 取得データフラグ（OX、PM2.5、風向）
 
-        public SoramameStation(int nCode, String strName, String strAddress)
-        {
+        public SoramameStation(int nCode, String strName, String strAddress) {
             setCode(nCode);
             setName(strName);
             setAddress(strAddress);
         }
 
         // Set
-        public void setCode(int nCode){ m_nCode = nCode; }
-        public void setName(String strName)
-        {
+        public void setCode(int nCode) {
+            m_nCode = nCode;
+        }
+
+        public void setName(String strName) {
             m_strName = strName;
         }
-        public void setAddress(String strAddress)
-        {
+
+        public void setAddress(String strAddress) {
             m_strAddress = strAddress;
         }
-        public void setAllow( boolean bAllow[] ){ m_bAllow = bAllow; }
+
+        public void setAllow(boolean bAllow[]) {
+            m_bAllow = bAllow;
+        }
 
         // Get
-        public int getCode()
-        {
+        public int getCode() {
             return m_nCode;
         }
-        public String getName()
-        {
+
+        public String getName() {
             return m_strName;
         }
-        public String getAddress()
-        {
+
+        public String getAddress() {
             //return m_strAddress;
-            return String.format("%s:OX(%s)PM2.5(%s)WD(%s)", m_strAddress, (m_bAllow[0] ? "○" : "×"),(m_bAllow[1] ? "○" : "×"),(m_bAllow[2] ? "○" : "×") );
+            return String.format("%s:OX(%s)PM2.5(%s)WD(%s)", m_strAddress, (m_bAllow[0] ? "○" : "×"), (m_bAllow[1] ? "○" : "×"), (m_bAllow[2] ? "○" : "×"));
         }
-        public String getString()
-        {
+
+        public String getString() {
 //            return String.format("%d %s:%s", m_nCode, m_strName, m_strAddress);
             return String.format("%s:%s", m_strName, m_strAddress);
         }
-        public boolean[] getAllow(){ return m_bAllow; }
-        public boolean getAllowOX(){ return m_bAllow[0]; }
+
+        public boolean[] getAllow() {
+            return m_bAllow;
+        }
+
+        public boolean getAllowOX() {
+            return m_bAllow[0];
+        }
+
+        public boolean isAllow() {
+            for (int i = 0; i < 3; i++) {
+                if (m_bAllow[i] == true) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     // そらまめの測定データクラス
@@ -93,16 +111,13 @@ public class Soramame implements Parcelable{
             try{
                 // データを取得できる確率が高い順
                 m_nWD = parseWD(strWD);
-                m_nPM25 = Integer.parseInt(strPM25);
-                m_fOX = Float.parseFloat(strOX);
-                m_fWS = Float.parseFloat(strWS);
+                m_nPM25 = getValue(strPM25, -100);
+                m_fOX = getValue(strOX, -0.1f);
+                m_fWS = getValue(strWS, -0.1f);
             }
+            // getValue()内にて例外キャッチしているので以下は不要。
             catch(NumberFormatException e){
                 e.printStackTrace();
-//                m_fOX = -0.1f;
-//                m_nPM25 = -100;
-//                m_nWD = -1;
-//                m_fWS = 0.0f;
             }
         }
 
@@ -131,6 +146,7 @@ public class Soramame implements Parcelable{
             return String.format("%d時", m_dDate.get(Calendar.HOUR_OF_DAY));
         }
         public float getOX(){ return m_fOX; }
+        public String getOXString(){return String.format("%.2f", m_fOX );}
         public  Integer getPM25()
         {
             return (m_nPM25 < 0 ? 0 : m_nPM25);
@@ -138,6 +154,7 @@ public class Soramame implements Parcelable{
         public String getPM25String(){ return String.format("%s",(m_nPM25 < 0 ? "未計測" : m_nPM25.toString()));}
         public Integer getWD(){ return m_nWD; }
         public float getWS(){ return m_fWS; }
+        public String getWSString(){ return String.format("%.1f", m_fWS); }
 
         public void setPM25(Integer pm25)
         {
@@ -219,7 +236,7 @@ public class Soramame implements Parcelable{
         addData(data);
     }
 
-    public void setAllow(String strOX, String strPM25, String strWD){
+    public boolean setAllow(String strOX, String strPM25, String strWD){
         boolean flag[] = new boolean[3];
         int code[] = new int[3];
         code[0] = strOX.codePointAt(0);
@@ -232,6 +249,7 @@ public class Soramame implements Parcelable{
             }
         }
         m_Station.setAllow(flag);
+        return m_Station.isAllow();
     }
 
     public void clearData(){
@@ -331,5 +349,28 @@ public class Soramame implements Parcelable{
         }while(strWD.length() > ++start);
 
         return nWD;
+    }
+
+    public Integer getValue(String strValue, Integer p){
+        Integer value;
+        value = p;
+        try{
+            value = Integer.parseInt(strValue);
+        }
+        catch(NumberFormatException e){
+            value = p;
+        }
+        return value;
+    }
+    public Float getValue(String strValue, Float p){
+        Float value;
+        value = p;
+        try{
+            value = Float.parseFloat(strValue);
+        }
+        catch(NumberFormatException e){
+            value = p;
+        }
+        return value;
     }
 }

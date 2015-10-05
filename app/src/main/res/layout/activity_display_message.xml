@@ -20,6 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="大気汚染物質"
+        android:textSize="@dimen/abc_text_size_menu_material"
         android:id="@+id/comment"
         android:layout_below="@+id/MstName"/>
     <Spinner

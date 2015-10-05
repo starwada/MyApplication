@@ -33,7 +33,7 @@ public class LunarBaseGraphView extends View {
     private float mTextHeight;
 
     private Soramame mSoramame;     // 測定局のPM2.5データ
-    private int mMax;                           // 表示データのMAX
+    private float mMax[] = new float[3];  // 表示データのMAX
     private Paint mBack;
     private Paint mLine ;
     private Paint mDot ;
@@ -42,6 +42,10 @@ public class LunarBaseGraphView extends View {
 
     private Paint mOX;
 //    private float[] mOXLines;
+    // 表示区分 PM2.5 OX（光化学オキシダント） WS（風速）
+    private float mDotY[][] = { {10.0f, 15.0f, 35.0f, 50.0f, 70.0f, 100.0f },
+        {0.02f, 0.04f, 0.06f, 0.12f, 0.24f, 0.34f },
+        {4.0f, 7.0f, 10.0f, 13.0f, 15.0f, 25.0f}};
 
     private int mIndex;                     // 強調日時インデックス
     private int mMode;                      // 表示データモード 0 PM2.5/1 OX
@@ -94,7 +98,7 @@ public class LunarBaseGraphView extends View {
             // Update TextPaint and text measurements from attributes
             invalidateTextPaintAndMeasurements();
 
-            mMax = 0;
+            mMax[0] = mMax[1] = mMax[2] = 0.0f;
             mBack = new Paint();
             mBack.setColor(Color.argb(75, 0, 0, 255));
             mLine = new Paint();
@@ -132,11 +136,13 @@ public class LunarBaseGraphView extends View {
         if(mSoramame != null){ mSoramame = null; }
         if( sora.getSize() < 1 ){ return ; }
 
-        mMax = 0;
+        mMax[0] = mMax[1] = mMax[2] = 0.0f;
         mSoramame = new Soramame(sora.getMstCode(), sora.getMstName(), sora.getAddress());
         ArrayList<Soramame.SoramameData> list = sora.getData();
         for( Soramame.SoramameData data : list){
-            if( data.getPM25() > mMax ){ mMax = data.getPM25(); }
+            if( (float)data.getPM25() > mMax[0] ){ mMax[0] = (float)data.getPM25(); }
+            if( data.getOX() > mMax[1] ){ mMax[1] = data.getOX(); }
+            if( data.getWS() > mMax[2] ){ mMax[2] = data.getWS(); }
             mSoramame.setData(data);
         }
 
@@ -177,32 +183,33 @@ public class LunarBaseGraphView extends View {
         // グラフ描画
         // グラフ背景
         float y = (float)(paddingTop+contentHeight);
-        float rh = (float)contentHeight/100;
+        float rh = (float)contentHeight/mDotY[mMode][5];
 
-        // ～１０
-        mRect.set( (float)paddingLeft, y-rh*10, (float)(paddingLeft+contentWidth), y);
+        // PM2.5/OX/WS
+        // ～１０/0.0-0.02/0.2-3.9
+        mRect.set( (float)paddingLeft, y-rh*mDotY[mMode][0], (float)(paddingLeft+contentWidth), y);
 //        mBack.setColor(Color.argb(75, 0, 0, 255));
         mBack.setColor(0xFF2196F3);
         canvas.drawRect(mRect, mBack);
-        // １１～１５
-        mRect.set( (float)paddingLeft, y-rh*15, (float)(paddingLeft+contentWidth), y-rh*10);
+        // １１～１５/0.021-0.04/4.0-6.9
+        mRect.set( (float)paddingLeft, y-rh*mDotY[mMode][1], (float)(paddingLeft+contentWidth), y-rh*mDotY[mMode][0]);
 //        mBack.setColor(Color.argb(75, 0, 255,255));
         mBack.setColor(0xFF81D4FA);
         canvas.drawRect(mRect, mBack);
-        // １６～３５
-        mRect.set( (float)paddingLeft, y-rh*35, (float)(paddingLeft+contentWidth), y-rh*15);
+        // １６～３５/0.041-0.06/7.0-9.9
+        mRect.set( (float)paddingLeft, y-rh*mDotY[mMode][2], (float)(paddingLeft+contentWidth), y-rh*mDotY[mMode][1]);
         mBack.setColor(Color.argb(75, 0, 255,128));
         canvas.drawRect(mRect, mBack);
-        // ３６～５０
-        mRect.set( (float)paddingLeft, y-rh*50, (float)(paddingLeft+contentWidth), y-rh*35);
+        // ３６～５０/0.061-0.119/10.0-12.9
+        mRect.set( (float)paddingLeft, y-rh*mDotY[mMode][3], (float)(paddingLeft+contentWidth), y-rh*mDotY[mMode][2]);
         mBack.setColor(Color.argb(75, 255, 255,0));
         canvas.drawRect(mRect, mBack);
-        // ５１～７０
-        mRect.set( (float)paddingLeft, y-rh*70, (float)(paddingLeft+contentWidth), y-rh*50);
+        // ５１～７０/0.12-0.239/13.0-14.9
+        mRect.set( (float)paddingLeft, y-rh*mDotY[mMode][4], (float)(paddingLeft+contentWidth), y-rh*mDotY[mMode][3]);
         mBack.setColor(Color.argb(75, 255, 128,0));
         canvas.drawRect(mRect, mBack);
-        // ７０～
-        mRect.set( (float)paddingLeft, y-rh*100, (float)(paddingLeft+contentWidth), y-rh*70);
+        // 70-100/0.24-0.34/15.0-25.0
+        mRect.set( (float)paddingLeft, y-rh*mDotY[mMode][5], (float)(paddingLeft+contentWidth), y-rh*mDotY[mMode][4]);
         mBack.setColor(Color.argb(75, 255, 0,0));
         canvas.drawRect(mRect, mBack);
 
@@ -214,8 +221,18 @@ public class LunarBaseGraphView extends View {
         mLine.setStrokeWidth(1);
         for(int i=0; i<5; i++){
             y -= (float)contentHeight/5;
-            canvas.drawLine( paddingLeft, y, paddingLeft+contentWidth, y, mLine );
-            canvas.drawText(String.format("%d", i*20+20), 0, y + mTextHeight/2, mTextPaint);
+            canvas.drawLine(paddingLeft, y, paddingLeft + contentWidth, y, mLine);
+            switch(mMode){
+                case 0:
+                    canvas.drawText(String.format("%d", i*20+20), 0, y + mTextHeight/2, mTextPaint);
+                    break;
+                case 1:
+                    canvas.drawText(String.format("%.2f", i*mDotY[mMode][5]/5.0f+mDotY[mMode][5]/5.0f), 0, y + mTextHeight/2, mTextPaint);
+                    break;
+                case 2:
+                    canvas.drawText(String.format("%.1f", i*mDotY[mMode][5]/5.0f+mDotY[mMode][5]/5.0f), 0, y + mTextHeight/2, mTextPaint);
+                    break;
+            }
         }
 
         // グラフ
@@ -234,14 +251,19 @@ public class LunarBaseGraphView extends View {
                 fradius = 3.0f;
                 switch(mMode){
                     case 0:
-                        doty = y - (data.getPM25() * (float)contentHeight / 100);
+                        doty = y - (data.getPM25() * (float)contentHeight / mDotY[mMode][5]);
                         break;
                     case 1:
-                        doty = y-((data.getOX()/0.24f) * (float)contentHeight * 0.7f );
+                        doty = y-(data.getOX() * (float)contentHeight /mDotY[mMode][5] );
+                        break;
+                    case 2:
+                        doty = y - (data.getWS() * (float)contentHeight / mDotY[mMode][5] );
                         break;
                 }
 
-                if( data.getPM25() > 0) {
+                if( (mMode == 0 && data.getPM25() > 0) ||
+                        (mMode == 1 && data.getOX() > 0.0) ||
+                        (mMode == 2 && data.getWS() > 0.0 )) {
                     if( nCount == mIndex) {
                         fradius = 12.0f;
                     }
@@ -277,7 +299,17 @@ public class LunarBaseGraphView extends View {
                     canvas.drawLine(x+gap, fOXY[0], x+gap+gap, fOXY[1], mOX);
                 }
             }
-            mExampleString = String.format("PM2.5 最高値:%02d μg/m3", mMax);
+            switch (mMode){
+                case 0:
+                    mExampleString = String.format("最高値:%.0f μg/m3", mMax[mMode]);
+                    break;
+                case 1:
+                    mExampleString = String.format("最高値:%.2f ppm", mMax[mMode]);
+                    break;
+                case 2:
+                    mExampleString = String.format("最高値:%.1f m/s", mMax[mMode]);
+                    break;
+            }
         }
 
         mTextPaint.setTextSize(60.0f);

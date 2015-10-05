@@ -74,6 +74,13 @@ public class DisplayMessageActivity extends ListActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 LunarBaseGraphView graph = (LunarBaseGraphView) findViewById(R.id.soragraph);
                 graph.setMode(position);
+                if(mAdapter != null){
+                    mAdapter.setMode(position);
+//                    mAdapter.notifyDataSetChanged();
+                    ListView listView = (ListView)findViewById(android.R.id.list);
+                    int nIndex = listView.getHeaderViewsCount();
+                    mAdapter.getView(nIndex, null, null);
+                }
             }
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
@@ -171,6 +178,7 @@ public class DisplayMessageActivity extends ListActivity {
             ArrayList<String> dataList = new ArrayList<String>();
             dataList.add("PM2.5");
             dataList.add("OX(光化学オキシダント)");
+            dataList.add("WS(風速)");
             ArrayAdapter<String> pref = new ArrayAdapter<String>(DisplayMessageActivity.this, android.R.layout.simple_spinner_item, dataList);
             pref.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             // スピナーリスト設定
