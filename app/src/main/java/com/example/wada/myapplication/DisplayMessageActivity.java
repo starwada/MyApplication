@@ -74,12 +74,13 @@ public class DisplayMessageActivity extends ListActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 LunarBaseGraphView graph = (LunarBaseGraphView) findViewById(R.id.soragraph);
                 graph.setMode(position);
+                // データリストビューの更新
                 if(mAdapter != null){
+                    // 指定種別データを表示するように
                     mAdapter.setMode(position);
-//                    mAdapter.notifyDataSetChanged();
+                    // 以下にてリストの表示を更新
                     ListView listView = (ListView)findViewById(android.R.id.list);
-                    int nIndex = listView.getHeaderViewsCount();
-                    mAdapter.getView(nIndex, null, null);
+                    listView.invalidateViews();
                 }
             }
             @Override

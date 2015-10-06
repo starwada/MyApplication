@@ -108,7 +108,6 @@ public class LunarBaseGraphView extends View {
             mDot.setColor(Color.argb(255, 255, 0, 0));
             mDot.setStrokeWidth(2);
             mRect = new RectF();
-//            mVert = new float[6];
             mIndex = 0;
             mMode = 0;
             // OX用のペイント情報
@@ -140,6 +139,7 @@ public class LunarBaseGraphView extends View {
         mSoramame = new Soramame(sora.getMstCode(), sora.getMstName(), sora.getAddress());
         ArrayList<Soramame.SoramameData> list = sora.getData();
         for( Soramame.SoramameData data : list){
+            // それぞれのMAX値を取得
             if( (float)data.getPM25() > mMax[0] ){ mMax[0] = (float)data.getPM25(); }
             if( data.getOX() > mMax[1] ){ mMax[1] = data.getOX(); }
             if( data.getWS() > mMax[2] ){ mMax[2] = data.getWS(); }
@@ -291,9 +291,8 @@ public class LunarBaseGraphView extends View {
 //                }
                 nCount += 1;
                 x -= gap;
+                // グラフ用ポリライン描画
                 fOXY[1] = fOXY[0];
-                // PM2.5 70以上で赤 OXは0.24
-                //fOXY[0] = y-((data.getOX()/0.24f) * (float)contentHeight * 0.7f );
                 fOXY[0] = doty;
                 if( nCount > 1){
                     canvas.drawLine(x+gap, fOXY[0], x+gap+gap, fOXY[1], mOX);
