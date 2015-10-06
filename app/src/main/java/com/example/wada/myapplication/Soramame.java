@@ -55,8 +55,8 @@ public class Soramame implements Parcelable{
         }
 
         public String getAddress() {
-            //return m_strAddress;
-            return String.format("%s:OX(%s)PM2.5(%s)WD(%s)", m_strAddress, (m_bAllow[0] ? "○" : "×"), (m_bAllow[1] ? "○" : "×"), (m_bAllow[2] ? "○" : "×"));
+            return m_strAddress;
+//            return String.format("%s:OX(%s)PM2.5(%s)WD(%s)", m_strAddress, (m_bAllow[0] ? "○" : "×"), (m_bAllow[1] ? "○" : "×"), (m_bAllow[2] ? "○" : "×"));
         }
 
         public String getString() {
@@ -70,6 +70,12 @@ public class Soramame implements Parcelable{
 
         public boolean getAllowOX() {
             return m_bAllow[0];
+        }
+        public boolean getAllowPM25(){
+            return  m_bAllow[1];
+        }
+        public boolean getAllowWS(){
+            return m_bAllow[2];
         }
 
         public boolean isAllow() {
@@ -146,7 +152,9 @@ public class Soramame implements Parcelable{
             return String.format("%d時", m_dDate.get(Calendar.HOUR_OF_DAY));
         }
         public float getOX(){ return m_fOX; }
-        public String getOXString(){return String.format("%.2f", m_fOX );}
+        public String getOXString(){
+            return (m_fOX < 0.0f ? "未計測" : String.format("%.2f", m_fOX ));
+        }
         public  Integer getPM25()
         {
             return (m_nPM25 < 0 ? 0 : m_nPM25);
@@ -154,7 +162,9 @@ public class Soramame implements Parcelable{
         public String getPM25String(){ return String.format("%s",(m_nPM25 < 0 ? "未計測" : m_nPM25.toString()));}
         public Integer getWD(){ return m_nWD; }
         public float getWS(){ return m_fWS; }
-        public String getWSString(){ return String.format("%.1f", m_fWS); }
+        public String getWSString(){
+            return ( m_fWS < 0.0f ? "未計測" : String.format("%.1f", m_fWS));
+        }
 
         public void setPM25(Integer pm25)
         {
@@ -250,6 +260,22 @@ public class Soramame implements Parcelable{
         }
         m_Station.setAllow(flag);
         return m_Station.isAllow();
+    }
+
+    public boolean getAllow(int index){
+        boolean flag = false;
+        switch(index){
+            case 0:
+                flag = m_Station.getAllowOX();
+                break;
+            case 1:
+                flag = m_Station.getAllowPM25();
+                break;
+            case 2:
+                flag = m_Station.getAllowWS();
+                break;
+        }
+        return flag;
     }
 
     public void clearData(){

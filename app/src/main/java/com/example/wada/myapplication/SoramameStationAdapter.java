@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.List;
@@ -27,11 +28,12 @@ public class SoramameStationAdapter extends ArrayAdapter<Soramame> {
         {
             convertView = mInflater.inflate(R.layout.stationlayout, parent, false);
             holder = new ViewHolder();
-//            holder.image = (ImageView)convertView.findViewById(R.id.image);
+            holder.imagePM25 = (ImageView)convertView.findViewById(R.id.imagePM25);
+            holder.imageOX = (ImageView)convertView.findViewById(R.id.imageOX);
+            holder.imageWS = (ImageView)convertView.findViewById(R.id.imageWS);
             holder.date = (TextView)convertView.findViewById(R.id.name);
             holder.value = (TextView)convertView.findViewById(R.id.address);
             convertView.setTag(holder);
-
         }
         else
         {
@@ -41,7 +43,18 @@ public class SoramameStationAdapter extends ArrayAdapter<Soramame> {
         Soramame data = getItem(position);
         holder.date.setText(data.getMstName());
         holder.value.setText(data.getAddress());
-
+        holder.imageOX.setImageResource(R.mipmap.ic_launcher_ox_off);
+        if(data.getAllow(0)){
+            holder.imageOX.setImageResource(R.mipmap.ic_launcher_ox_on);
+        }
+        holder.imagePM25.setImageResource(R.mipmap.ic_launcher_pm25_off);
+        if(data.getAllow(1)){
+            holder.imagePM25.setImageResource(R.mipmap.ic_launcher_pm25_on);
+        }
+        holder.imageWS.setImageResource(R.mipmap.ic_launcher_ws_off);
+        if(data.getAllow(2)){
+            holder.imageWS.setImageResource(R.mipmap.ic_launcher_ws_on);
+        }
         return convertView;
     }
 }

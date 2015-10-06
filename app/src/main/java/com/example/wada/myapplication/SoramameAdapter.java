@@ -16,7 +16,9 @@ import java.util.List;
 
 class ViewHolder
 {
-//    ImageView image;
+    ImageView imagePM25;
+    ImageView imageOX;
+    ImageView imageWS;
     TextView date;
     TextView hour;
     TextView value;
