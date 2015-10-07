@@ -8,8 +8,10 @@ import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -17,6 +19,7 @@ import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -64,6 +67,25 @@ public class DisplayMessageActivity extends ListActivity {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 LunarBaseGraphView graph = (LunarBaseGraphView) findViewById(R.id.soragraph);
                 graph.setPos(position);
+            }
+        });
+
+        // グラフビューにタッチリスナー設定
+        final LunarBaseGraphView graph = (LunarBaseGraphView) findViewById(R.id.soragraph);
+        graph.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getActionMasked() == MotionEvent.ACTION_MOVE ) {
+                    float px = event.getX(0);
+                    int sum = event.getPointerCount();
+                    graph.Touch(px);
+                }
+                else if(event.getActionMasked() == MotionEvent.ACTION_UP){
+                    graph.showToast();
+                    ListView listView = (ListView)findViewById(android.R.id.list);
+                    listView.setSelection(graph.getPos());
+                }
+                return true;
             }
         });
 

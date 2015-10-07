@@ -9,10 +9,10 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.text.TextPaint;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
+import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -48,6 +48,8 @@ public class LunarBaseGraphView extends View {
         {4.0f, 7.0f, 10.0f, 13.0f, 15.0f, 25.0f}};
 
     private int mIndex;                     // 強調日時インデックス
+    private String mstrValue;
+    private int mToastPos[] = { 0,0 };
     private int mMode;                      // 表示データモード 0 PM2.5/1 OX
 
     public LunarBaseGraphView(Context context) {
@@ -156,10 +158,37 @@ public class LunarBaseGraphView extends View {
         invalidate();
     }
 
+    public int getPos(){
+        return mIndex;
+    }
+
     // 表示データ設定
     public void setMode(int mode){
         mMode = mode;
         invalidate();
+    }
+
+    // タッチ処理
+    public void Touch(float px){
+        if (mSoramame.getSize() > 0) {
+            int contentWidth = getWidth() - getPaddingLeft() - getPaddingRight();
+
+            ArrayList<Soramame.SoramameData> list = mSoramame.getData();
+            float x = getWidth() - getPaddingRight();
+            float gap = (float) contentWidth / list.size();
+            int pos = 0;
+            if(x-px < 0.0f){ pos = 0; }
+            else if(px < getPaddingLeft()){ pos = list.size()-1; }
+            else if(gap > 0.0){ pos = (int)((x-px)/gap); }
+            setPos(pos);
+        }
+    }
+
+    // カレントにトースト（ツールチップ）表示
+    public void showToast(){
+        Toast toast = Toast.makeText(this.getContext(), mstrValue, Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.TOP|Gravity.LEFT, mToastPos[0], mToastPos[1]);
+        toast.show();
     }
 
     @Override
@@ -266,6 +295,20 @@ public class LunarBaseGraphView extends View {
                         (mMode == 2 && data.getWS() > 0.0 )) {
                     if( nCount == mIndex) {
                         fradius = 12.0f;
+                        mstrValue = data.getCalendarString() + " ";
+                        switch(mMode){
+                            case 0:
+                                mstrValue += data.getPM25String();
+                                break;
+                            case 1:
+                                mstrValue += data.getOXString();
+                                break;
+                            case 2:
+                                mstrValue += data.getWSString();
+                                break;
+                        }
+                        mToastPos[0] = (int)x;
+                        mToastPos[1] = (int)doty;
                     }
                     canvas.drawCircle(x, doty, fradius, mDot);
                 }
@@ -326,6 +369,34 @@ public class LunarBaseGraphView extends View {
 //            mExampleDrawable.draw(canvas);
 //        }
     }
+
+    // 使用側にてリスナーにて処理をする
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event){
+//
+//        if(event.getActionMasked() == MotionEvent.ACTION_MOVE ) {
+//            float px = event.getX(0);
+//            if (mSoramame.getSize() > 0) {
+//                int contentWidth = getWidth() - getPaddingLeft() - getPaddingRight();
+//
+//                ArrayList<Soramame.SoramameData> list = mSoramame.getData();
+//                float x = getWidth() - getPaddingRight();
+//                float gap = (float) contentWidth / list.size();
+//                int pos = 0;
+//                if(x-px < 0.0f){ pos = 0; }
+//                else if(px < getPaddingLeft()){ pos = list.size()-1; }
+//                else if(gap > 0.0){ pos = (int)((x-px)/gap); }
+//                setPos(pos);
+//            }
+//        }
+//        else if(event.getActionMasked() == MotionEvent.ACTION_UP){
+//            Toast toast = Toast.makeText(this.getContext(), mstrValue, Toast.LENGTH_SHORT);
+//            toast.setGravity(Gravity.TOP|Gravity.LEFT, mToastPos[0], mToastPos[1]);
+//            toast.show();
+//        }
+//
+//        return true;
+//    }
 
     /**
      * Gets the example string attribute value.
