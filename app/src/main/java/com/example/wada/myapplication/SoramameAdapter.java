@@ -49,7 +49,7 @@ public class SoramameAdapter extends ArrayAdapter<Soramame.SoramameData> {
         {
             convertView = mInflater.inflate(R.layout.layout, parent, false);
             holder = new ViewHolder();
-//            holder.image = (ImageView)convertView.findViewById(R.id.image);
+            holder.imageWS = (ImageView)convertView.findViewById(R.id.imageWS);
             holder.date = (TextView)convertView.findViewById(R.id.date);
             holder.hour = (TextView)convertView.findViewById(R.id.hour);
             holder.value = (TextView)convertView.findViewById(R.id.value);
@@ -66,12 +66,24 @@ public class SoramameAdapter extends ArrayAdapter<Soramame.SoramameData> {
         switch(mMode){
             case 0:
                 holder.value.setText(data.getPM25String());
+                holder.imageWS.setVisibility(View.INVISIBLE);
                 break;
             case 1:
                 holder.value.setText(data.getOXString());
+                holder.imageWS.setVisibility(View.INVISIBLE);
                 break;
             case 2:
-                holder.value.setText(data.getWSString());
+                // 風向のアイコン用にスペースを入れる
+                holder.value.setText(data.getWSString()+"　");
+                // 静穏の場合
+                if(data.getWDRotation() < 0.0f) {
+                    holder.imageWS.setVisibility(View.INVISIBLE);
+                }else{
+                    holder.imageWS.setVisibility(View.VISIBLE);
+                    // 風向の向きにアイコンを回転させる
+                    holder.imageWS.setRotation(data.getWDRotation());
+                }
+
                 break;
         }
 
