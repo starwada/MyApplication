@@ -5,7 +5,6 @@ import android.os.Parcelable;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 
 /**
@@ -80,7 +79,7 @@ public class Soramame implements Parcelable{
 
         public boolean isAllow() {
             for (int i = 0; i < 3; i++) {
-                if (m_bAllow[i] == true) {
+                if (m_bAllow[i]) {
                     return true;
                 }
             }
