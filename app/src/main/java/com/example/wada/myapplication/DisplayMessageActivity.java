@@ -4,7 +4,9 @@ import android.app.ActionBar;
 import android.app.ListActivity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
+import android.os.Environment;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -26,6 +28,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -103,6 +107,33 @@ public class DisplayMessageActivity extends ListActivity {
                     // 以下にてリストの表示を更新
                     ListView listView = (ListView)findViewById(android.R.id.list);
                     listView.invalidateViews();
+                }
+
+                graph.setDrawingCacheEnabled(true);
+                // Viewのキャッシュを取得
+                Bitmap cache = graph.getDrawingCache();
+                Bitmap screenShot = Bitmap.createBitmap(cache);
+                graph.setDrawingCacheEnabled(false);
+                // 読み書きするファイル名を指定
+                File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg");
+                // 指定したファイル名が無ければ作成する。
+                file.getParentFile().mkdir();
+                FileOutputStream fos = null;
+                try {
+                    fos = new FileOutputStream(file, false);
+                    // 画像のフォーマットと画質と出力先を指定して保存
+                    screenShot.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                    fos.flush();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                } finally {
+                    if (fos != null) {
+                        try {
+                            fos.close();
+                        } catch (IOException ie) {
+                            fos = null;
+                        }
+                    }
                 }
             }
             @Override
