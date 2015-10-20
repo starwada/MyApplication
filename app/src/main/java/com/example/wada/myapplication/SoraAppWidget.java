@@ -5,6 +5,9 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Environment;
 import android.widget.RemoteViews;
 
 /**
@@ -48,6 +51,10 @@ public class SoraAppWidget extends AppWidgetProvider {
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.sora_app_widget);
         views.setTextViewText(R.id.appwidget_text, widgetText);
+
+        //RemoteViews image = new RemoteViews(context.getPackageName(), R.layout.sora_app_widget);
+        Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg");
+        views.setImageViewBitmap(R.id.appwidget_image, bmap);
 
         // Create an Intent to launch ExampleActivity
         Intent intent = new Intent(context, MainActivity.class);
