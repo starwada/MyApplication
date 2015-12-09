@@ -52,11 +52,11 @@ public class SoraAppWidget extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.sora_app_widget);
         views.setTextViewText(R.id.appwidget_text, widgetText);
 
-        //RemoteViews image = new RemoteViews(context.getPackageName(), R.layout.sora_app_widget);
+        RemoteViews image = new RemoteViews(context.getPackageName(), R.layout.sora_app_widget);
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg", options);
-        views.setImageViewBitmap(R.id.appwidget_image, bmap);
+        image.setImageViewBitmap(R.id.appwidget_image, bmap);
 
         // Create an Intent to launch ExampleActivity
         Intent intent = new Intent(context, MainActivity.class);
@@ -69,6 +69,8 @@ public class SoraAppWidget extends AppWidgetProvider {
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, views);
+        appWidgetManager.updateAppWidget(appWidgetId, image);
+        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.appwidget_image);
     }
 }
 

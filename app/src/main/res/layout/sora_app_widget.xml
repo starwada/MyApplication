@@ -1,6 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent"
-    android:padding="@dimen/widget_margin" android:background="#09C">
+    android:padding="@dimen/widget_margin" android:background="@android:color/background_light">
 
     <TextView
         android:id="@+id/appwidget_text"
@@ -20,6 +20,7 @@
         android:id="@+id/appwidget_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/example_appwidget_preview"/>
+        android:src="@drawable/example_appwidget_preview"
+        android:foregroundGravity="top" />
 
 </RelativeLayout>
