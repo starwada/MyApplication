@@ -2,17 +2,22 @@ package com.example.wada.myapplication;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.os.Environment;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -194,8 +199,38 @@ public class LunarBaseGraphView extends View {
     // カレントにトースト（ツールチップ）表示
     public void showToast(){
         Toast toast = Toast.makeText(this.getContext(), mstrValue, Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.TOP|Gravity.LEFT, mToastPos[0], mToastPos[1]);
+        toast.setGravity(Gravity.TOP|Gravity.START, mToastPos[0], mToastPos[1]);
         toast.show();
+    }
+
+    // キャプチャ
+    public void Capture() {
+        setDrawingCacheEnabled(true);
+        // Viewのキャッシュを取得
+        Bitmap cache = getDrawingCache();
+        Bitmap screenShot = Bitmap.createBitmap(cache);
+        setDrawingCacheEnabled(false);
+        // 読み書きするファイル名を指定
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg");
+        // 指定したファイル名が無ければ作成する。
+        file.getParentFile().mkdir();
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(file, false);
+            // 画像のフォーマットと画質と出力先を指定して保存
+            screenShot.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException ie) {
+                    fos = null;
+                }
+            }
+        }
     }
 
     @Override
@@ -292,13 +327,13 @@ public class LunarBaseGraphView extends View {
                 fradius = 3.0f;
                 switch(mMode){
                     case 0:
-                        doty = y - (data.getPM25() * (float)contentHeight / mDotY[mMode][5]);
+                        doty = y-(data.getPM25() * (float)contentHeight/mDotY[mMode][5]);
                         break;
                     case 1:
-                        doty = y-(data.getOX() * (float)contentHeight /mDotY[mMode][5] );
+                        doty = y-(data.getOX() * (float)contentHeight/mDotY[mMode][5]);
                         break;
                     case 2:
-                        doty = y - (data.getWS() * (float)contentHeight / mDotY[mMode][5] );
+                        doty = y-(data.getWS() * (float)contentHeight/mDotY[mMode][5]);
                         break;
                 }
 
@@ -348,7 +383,7 @@ public class LunarBaseGraphView extends View {
                 x -= gap;
                 // グラフ用ポリライン描画
                 fOXY[1] = fOXY[0];
-                fOXY[0] = doty;
+                fOXY[0] = (doty > y ? y : doty);
                 if( nCount > 1){
                     canvas.drawLine(x+gap, fOXY[0], x+gap+gap, fOXY[1], mOX);
                 }
