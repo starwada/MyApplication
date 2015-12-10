@@ -49,7 +49,8 @@ public class LunarBaseGraphView extends View {
     private int mIndex;                     // 強調日時インデックス
     private String mstrValue;
     private int mToastPos[] = { 0,0 };
-    private int mMode;                      // 表示データモード 0 PM2.5/1 OX
+    private int mMode;                      // 表示データモード 0 PM2.5/1 OX/2 風速
+    private int mDispDay;               // 表示日数 0 全て
 
     public LunarBaseGraphView(Context context) {
         super(context);
@@ -111,6 +112,7 @@ public class LunarBaseGraphView extends View {
             mRect = new RectF();
             mIndex = 0;
             mMode = 0;
+            mDispDay = 0;
             // OX用のペイント情報
             mOX = new Paint();
             mOX.setColor(Color.argb(75, 255, 0, 0));
@@ -164,6 +166,12 @@ public class LunarBaseGraphView extends View {
     // 表示データ設定
     public void setMode(int mode){
         mMode = mode;
+        invalidate();
+    }
+
+    // 表示日数設定
+    public void setDispDay(int dispDay){
+        mDispDay = dispDay;
         invalidate();
     }
 
@@ -267,7 +275,11 @@ public class LunarBaseGraphView extends View {
         if(mSoramame.getSize() > 0){
             ArrayList<Soramame.SoramameData> list = mSoramame.getData();
             float x=paddingLeft+contentWidth;
-            float gap = (float)contentWidth/list.size();
+            // ここで、時間（データ数）での分割
+            // listには新しいデータから入っている
+            float gap = 0.0f ;
+            if( mDispDay == 0 ){ gap = (float)contentWidth/list.size(); }
+            else { gap = (float)contentWidth/(mDispDay*24) ; }
 
             y = (float)(paddingTop + contentHeight);
 
@@ -276,6 +288,7 @@ public class LunarBaseGraphView extends View {
             float fradius = 3.0f;
             float fOXY[] = { 0.0f, 0.0f  };
             for( Soramame.SoramameData data : list){
+                if( mDispDay != 0 && nCount > mDispDay*24 ){ break; }
                 fradius = 3.0f;
                 switch(mMode){
                     case 0:

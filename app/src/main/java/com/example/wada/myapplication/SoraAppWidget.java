@@ -49,13 +49,16 @@ public class SoraAppWidget extends AppWidgetProvider {
 
         CharSequence widgetText = SoraAppWidgetConfigureActivity.loadTitlePref(context, appWidgetId);
         // Construct the RemoteViews object
-        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.sora_app_widget);
-        views.setTextViewText(R.id.appwidget_text, widgetText);
+///        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.sora_app_widget);
+//        views.setTextViewText(R.id.appwidget_text, widgetText);
 
         RemoteViews image = new RemoteViews(context.getPackageName(), R.layout.sora_app_widget);
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg", options);
+        // optionsの設定を間違うと、以下の関数ではBitmapが作成されない。
+//        Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg", options);
+        // とりあえず、optionsは未設定（規定値）の以下にて表示されるようになった。
+        Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg");
         image.setImageViewBitmap(R.id.appwidget_image, bmap);
 
         // Create an Intent to launch ExampleActivity
@@ -64,13 +67,11 @@ public class SoraAppWidget extends AppWidgetProvider {
 
         // Get the layout for the App Widget and attach an on-click listener
         // to the button
-        //RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.appwidget_provider_layout);
-        views.setOnClickPendingIntent(R.id.appwidget_text, pendingIntent);
+        image.setOnClickPendingIntent(R.id.appwidget_text, pendingIntent);
 
         // Instruct the widget manager to update the widget
-        appWidgetManager.updateAppWidget(appWidgetId, views);
+//        appWidgetManager.updateAppWidget(appWidgetId, views);
         appWidgetManager.updateAppWidget(appWidgetId, image);
-        appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetId, R.id.appwidget_image);
     }
 }
 
