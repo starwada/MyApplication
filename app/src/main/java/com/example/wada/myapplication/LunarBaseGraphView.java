@@ -117,7 +117,7 @@ public class LunarBaseGraphView extends View {
             mRect = new RectF();
             mIndex = 0;
             mMode = 0;
-            mDispDay = 0;
+            mDispDay = 3;
             // OX用のペイント情報
             mOX = new Paint();
             mOX.setColor(Color.argb(75, 255, 0, 0));
@@ -218,6 +218,7 @@ public class LunarBaseGraphView extends View {
         try {
             fos = new FileOutputStream(file, false);
             // 画像のフォーマットと画質と出力先を指定して保存
+            // 100で165KB、値を半分にすると1/4に減る
             screenShot.compress(Bitmap.CompressFormat.JPEG, 100, fos);
             fos.flush();
         } catch (Exception e) {

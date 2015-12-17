@@ -6,7 +6,7 @@
     <com.example.wada.myapplication.LunarBaseGraphView
         android:background="#ccc"
         android:layout_width="fill_parent"
-        android:layout_height="300dp"
+        android:layout_height="200dp"
         android:paddingLeft="20dp"
         android:paddingRight="20dp"
         android:paddingTop="20dp"
