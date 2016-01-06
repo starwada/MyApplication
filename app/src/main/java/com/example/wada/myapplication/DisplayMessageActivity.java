@@ -144,7 +144,7 @@ public class DisplayMessageActivity extends ListActivity {
             }
         });
 
-        // 表示データ種別の設定
+        // 表示日数の設定
         Spinner spinnerDay = (Spinner)findViewById(R.id.spinnerDay);
         spinnerDay.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
             @Override
@@ -265,6 +265,7 @@ public class DisplayMessageActivity extends ListActivity {
             dayList.add("５日");
             dayList.add("６日");
             dayList.add("７日");
+            dayList.add("最大");
             ArrayAdapter<String> day = new ArrayAdapter<String>(DisplayMessageActivity.this, android.R.layout.simple_spinner_item, dayList);
             day.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
             // スピナーリスト設定

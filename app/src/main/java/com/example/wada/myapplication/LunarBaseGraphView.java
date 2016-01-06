@@ -176,7 +176,12 @@ public class LunarBaseGraphView extends View {
 
     // 表示日数設定
     public void setDispDay(int dispDay){
+        // 入力はインデックスなので１を足す。
         mDispDay = dispDay+1;
+        // 最大（8）は全日数（0）とする。
+        if(mDispDay == 8){
+            mDispDay = 0;
+        }
         invalidate();
     }
 

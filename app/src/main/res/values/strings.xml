@@ -7,6 +7,8 @@
     <string name="Title">都道府県</string>
     <string name="desc">測定局</string>
     <string name="nonedata">未計測</string>
+    <string name="disptype">大気汚染物質</string>
+    <string name="dispday"> 表示日数</string>
 
     <string name="hello_world">そらまめ!</string>
     <string name="title_activity_graph">GraphActivity</string>
