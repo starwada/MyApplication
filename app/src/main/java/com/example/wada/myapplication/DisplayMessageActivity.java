@@ -143,6 +143,21 @@ public class DisplayMessageActivity extends ListActivity {
 
             }
         });
+
+        // 表示データ種別の設定
+        Spinner spinnerDay = (Spinner)findViewById(R.id.spinnerDay);
+        spinnerDay.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                LunarBaseGraphView graph = (LunarBaseGraphView) findViewById(R.id.soragraph);
+                graph.setDispDay(position);
+            }
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
+
+                }
+            });
+
     }
 
     @Override
@@ -241,6 +256,21 @@ public class DisplayMessageActivity extends ListActivity {
             Spinner prefSpinner = (Spinner)findViewById(R.id.spinner2);
             prefSpinner.setAdapter(pref);
             prefSpinner.setSelection(0);
+
+            ArrayList<String> dayList = new ArrayList<String>();
+            dayList.add("１日");
+            dayList.add("２日");
+            dayList.add("３日");
+            dayList.add("４日");
+            dayList.add("５日");
+            dayList.add("６日");
+            dayList.add("７日");
+            ArrayAdapter<String> day = new ArrayAdapter<String>(DisplayMessageActivity.this, android.R.layout.simple_spinner_item, dayList);
+            day.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            // スピナーリスト設定
+            Spinner DaySpinner = (Spinner)findViewById(R.id.spinnerDay);
+            DaySpinner.setAdapter(day);
+            DaySpinner.setSelection(2);
 
             mProgressDialog.dismiss();
         }

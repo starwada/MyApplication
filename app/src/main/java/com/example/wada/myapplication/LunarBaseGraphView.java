@@ -176,7 +176,7 @@ public class LunarBaseGraphView extends View {
 
     // 表示日数設定
     public void setDispDay(int dispDay){
-        mDispDay = dispDay;
+        mDispDay = dispDay+1;
         invalidate();
     }
 
