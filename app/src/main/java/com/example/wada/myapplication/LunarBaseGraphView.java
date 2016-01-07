@@ -192,7 +192,9 @@ public class LunarBaseGraphView extends View {
 
             ArrayList<Soramame.SoramameData> list = mSoramame.getData();
             float x = getWidth() - getPaddingRight();
-            float gap = (float) contentWidth / list.size();
+            float gap = 0.0f;
+            if( mDispDay == 0 ){ gap = (float)contentWidth/list.size(); }
+            else { gap = (float)contentWidth/(mDispDay*24) ; }
             int pos = 0;
             if(x-px < 0.0f){ pos = 0; }
             else if(px < getPaddingLeft()){ pos = list.size()-1; }
