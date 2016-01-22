@@ -7,6 +7,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Environment;
 import android.widget.RemoteViews;
 
@@ -59,6 +62,11 @@ public class SoraAppWidget extends AppWidgetProvider {
 //        Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg", options);
         // とりあえず、optionsは未設定（規定値）の以下にて表示されるようになった。
         Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg");
+        Canvas cv = new Canvas( bmap );
+        Paint mOX = new Paint();
+        mOX.setColor(Color.argb(75, 255, 0, 0));
+        mOX.setStrokeWidth(2.4f);
+        cv.drawText("Wada", 10.0f, 10.0f, mOX);
         image.setImageViewBitmap(R.id.appwidget_image, bmap);
 
         // Create an Intent to launch ExampleActivity
