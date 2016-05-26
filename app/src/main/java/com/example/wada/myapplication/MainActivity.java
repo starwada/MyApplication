@@ -36,6 +36,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -245,17 +246,19 @@ public class MainActivity extends AppCompatActivity {
             try
             {
                 FileInputStream infile = openFileInput(SORAPREFFILE);
-                byte[] readBytes = new byte[infile.available()];
-                infile.read(readBytes);
+                int byteCount = infile.available();
+                byte[] readBytes = new byte[byteCount];
+                rc = infile.read(readBytes, 0, byteCount) ;
                 String strBytes = new String(readBytes);
                 infile.close();
 
                 prefList.clear();
                 String Pref[] = strBytes.split(",");
-                for( String ele : Pref)
-                {
-                   prefList.add(ele);
-                }
+                Collections.addAll(prefList, Pref);
+//                for( String ele : Pref)
+//                {
+//                   prefList.add(ele);
+//                }
             }
             catch (FileNotFoundException e)
             {
@@ -295,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
         {
             try
             {
-                url = String.format("%s%s%d", SORABASEURL, SORAPREFURL, mPref);
+                url = String.format(Locale.ENGLISH, "%s%s%d", SORABASEURL, SORAPREFURL, mPref);
                 Document doc = Jsoup.connect(url).get();
                 Elements elements = doc.getElementsByAttributeValue("name", "Hyou");
                 for( Element element : elements)
@@ -377,7 +380,7 @@ public class MainActivity extends AppCompatActivity {
             {
                 if(mSoramame == null){ return null;}
                 // 本来、ここに測定局コードを指定する。
-                String url = String.format("%s%s%d", SORABASEURL, SORADATAURL, mSoramame.getMstCode());
+                String url = String.format(Locale.ENGLISH, "%s%s%d", SORABASEURL, SORADATAURL, mSoramame.getMstCode());
                 Document doc = Jsoup.connect(url).get();
                 Elements elements = doc.getElementsByAttributeValue("name", "Hyou");
 //                Integer size = elements.size();

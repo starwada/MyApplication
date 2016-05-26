@@ -59,14 +59,14 @@ public class SoraAppWidget extends AppWidgetProvider {
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
         // optionsの設定を間違うと、以下の関数ではBitmapが作成されない。
-//        Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg", options);
+        Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg", options);
         // とりあえず、optionsは未設定（規定値）の以下にて表示されるようになった。
-        Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg");
-        Canvas cv = new Canvas( bmap );
-        Paint mOX = new Paint();
-        mOX.setColor(Color.argb(75, 255, 0, 0));
-        mOX.setStrokeWidth(2.4f);
-        cv.drawText("Wada", 10.0f, 10.0f, mOX);
+//        Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg");
+//        Canvas cv = new Canvas( bmap );
+//        Paint mOX = new Paint();
+//        mOX.setColor(Color.argb(75, 255, 0, 0));
+//        mOX.setStrokeWidth(2.4f);
+//        cv.drawText("Wada", 10.0f, 10.0f, mOX);
         image.setImageViewBitmap(R.id.appwidget_image, bmap);
 
         // Create an Intent to launch ExampleActivity
