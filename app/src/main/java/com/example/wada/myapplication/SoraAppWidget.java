@@ -56,12 +56,12 @@ public class SoraAppWidget extends AppWidgetProvider {
 //        views.setTextViewText(R.id.appwidget_text, widgetText);
 
         RemoteViews image = new RemoteViews(context.getPackageName(), R.layout.sora_app_widget);
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inJustDecodeBounds = true;
+        //BitmapFactory.Options options = new BitmapFactory.Options();
+        //options.inJustDecodeBounds = true;
         // optionsの設定を間違うと、以下の関数ではBitmapが作成されない。
-        Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg", options);
+        //Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg", options);
         // とりあえず、optionsは未設定（規定値）の以下にて表示されるようになった。
-//        Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg");
+        Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg");
 //        Canvas cv = new Canvas( bmap );
 //        Paint mOX = new Paint();
 //        mOX.setColor(Color.argb(75, 255, 0, 0));
