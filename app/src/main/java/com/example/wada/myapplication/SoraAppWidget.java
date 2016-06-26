@@ -52,8 +52,8 @@ public class SoraAppWidget extends AppWidgetProvider {
 
         CharSequence widgetText = SoraAppWidgetConfigureActivity.loadTitlePref(context, appWidgetId);
         // Construct the RemoteViews object
-///        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.sora_app_widget);
-//        views.setTextViewText(R.id.appwidget_text, widgetText);
+        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.sora_app_widget);
+        views.setTextViewText(R.id.appwidget_text, widgetText);
 
         RemoteViews image = new RemoteViews(context.getPackageName(), R.layout.sora_app_widget);
         //BitmapFactory.Options options = new BitmapFactory.Options();
