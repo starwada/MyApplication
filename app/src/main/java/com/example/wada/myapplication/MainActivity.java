@@ -407,7 +407,9 @@ public class MainActivity extends AppCompatActivity {
         protected void onPostExecute(Void result)
         {
             // リスト用アクティビティ
-            Intent intent = new Intent(MainActivity.this, DisplayMessageActivity.class);
+//            Intent intent = new Intent(MainActivity.this, DisplayMessageActivity.class);
+//            intent.setData(Uri.parse(m_strMstURL));
+            Intent intent = new Intent(MainActivity.this, Main3Activity.class);
             intent.setData(Uri.parse(m_strMstURL));
             intent.putExtra("mine", mSoramame);
             startActivity(intent);
