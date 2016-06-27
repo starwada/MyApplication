@@ -5,8 +5,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.os.Environment;
 import android.text.TextPaint;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 
@@ -51,8 +55,8 @@ public class GraphFactory {
         mOX.setStrokeWidth(2.4f);
         float TextHeight = 3.0f;
 
-        int nWidth = 100;
-        int nHeight = 100;
+        int nWidth = 200;
+        int nHeight = 200;
         Bitmap graph = Bitmap.createBitmap(nWidth, nHeight, Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(graph);
@@ -191,7 +195,31 @@ public class GraphFactory {
 //                    break;
 //            }
         }
+        // 測定局
+        canvas.drawText(String.format("%s", soramame.getMstName()), paddingLeft, paddingTop + TextHeight, mTextPaint);
 
+        // 読み書きするファイル名を指定
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg");
+        // 指定したファイル名が無ければ作成する。
+        file.getParentFile().mkdir();
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(file, false);
+            // 画像のフォーマットと画質と出力先を指定して保存
+            // 100で165KB、値を半分にすると1/4に減る
+            graph.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            fos.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException ie) {
+                    fos = null;
+                }
+            }
+        }
 
         return graph;
     }
