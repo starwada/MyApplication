@@ -61,18 +61,23 @@ public class SoraAppWidget extends AppWidgetProvider {
         // optionsの設定を間違うと、以下の関数ではBitmapが作成されない。
         //Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg", options);
         // とりあえず、optionsは未設定（規定値）の以下にて表示されるようになった。
-        Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg");
+        Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.png");
 //        Canvas cv = new Canvas( bmap );
 //        Paint mOX = new Paint();
 //        mOX.setColor(Color.argb(75, 255, 0, 0));
 //        mOX.setStrokeWidth(2.4f);
 //        cv.drawText("Wada", 10.0f, 10.0f, mOX);
         image.setImageViewBitmap(R.id.appwidget_image, bmap);
-        image.setTextViewText(R.id.appwidget_text, widgetText);
+//        image.setTextViewText(R.id.appwidget_text, widgetText);
 
         // Create an Intent to launch ExampleActivity
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+//        Soramame soramame = intent.getParcelableExtra("mine");
+//        if(soramame != null) {
+//            widgetText = soramame.getMstName();
+//            image.setTextViewText(R.id.appwidget_text, widgetText);
+//        }
 
         // Get the layout for the App Widget and attach an on-click listener
         // to the button

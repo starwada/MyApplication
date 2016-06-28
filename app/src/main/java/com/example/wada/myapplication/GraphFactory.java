@@ -36,6 +36,7 @@ public class GraphFactory {
 
         int mMode;                      // 表示データモード 0 PM2.5/1 OX/2 風速
         int mDispDay;               // 表示日数 0 全て
+        int mDispHour = 6;              // 表示時間
 
         mMax[0] = mMax[1] = mMax[2] = 0.0f;
         mBack = new Paint();
@@ -55,12 +56,12 @@ public class GraphFactory {
         mOX.setStrokeWidth(2.4f);
         float TextHeight = 3.0f;
 
-        int nWidth = 200;
+        int nWidth = 340;
         int nHeight = 200;
         Bitmap graph = Bitmap.createBitmap(nWidth, nHeight, Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(graph);
-        canvas.drawColor(Color.GREEN);
+        canvas.drawColor(Color.LTGRAY);
 
         int paddingLeft = 10;
         int paddingTop = 10;
@@ -112,20 +113,24 @@ public class GraphFactory {
         canvas.drawLine( paddingLeft, paddingTop, paddingLeft, contentHeight+paddingTop, mLine );
         y = (float)(paddingTop+contentHeight);
         mLine.setStrokeWidth(1);
+        Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
+        // ほぼ文字高さのようなので、マイナスで返るので反転
+        TextHeight = -fontMetrics.ascent;
+
         for(int i=0; i<5; i++){
             y -= (float)contentHeight/5;
             canvas.drawLine(paddingLeft, y, paddingLeft + contentWidth, y, mLine);
-//            switch(mMode){
-//                case 0:
-//                    canvas.drawText(String.format("%d", i*20+20), 0, y + mTextHeight/2, mTextPaint);
-//                    break;
-//                case 1:
-//                    canvas.drawText(String.format("%.2f", i*mDotY[mMode][5]/5.0f+mDotY[mMode][5]/5.0f), 0, y + mTextHeight/2, mTextPaint);
-//                    break;
-//                case 2:
-//                    canvas.drawText(String.format("%.1f", i*mDotY[mMode][5]/5.0f+mDotY[mMode][5]/5.0f), 0, y + mTextHeight/2, mTextPaint);
-//                    break;
-//            }
+            switch(mMode){
+                case 0:
+                    canvas.drawText(String.format("%d", i*20+20), 0, y + TextHeight/2, mTextPaint);
+                    break;
+                case 1:
+                    canvas.drawText(String.format("%.2f", i*mDotY[mMode][5]/5.0f+mDotY[mMode][5]/5.0f), 0, y + TextHeight/2, mTextPaint);
+                    break;
+                case 2:
+                    canvas.drawText(String.format("%.1f", i*mDotY[mMode][5]/5.0f+mDotY[mMode][5]/5.0f), 0, y + TextHeight/2, mTextPaint);
+                    break;
+            }
         }
 
         // グラフ
@@ -136,7 +141,7 @@ public class GraphFactory {
             // listには新しいデータから入っている
             float gap = 0.0f ;
             if( mDispDay == 0 ){ gap = (float)contentWidth/list.size(); }
-            else { gap = (float)contentWidth/(mDispDay*24) ; }
+            else { gap = (float)contentWidth/(mDispHour) ; }
 
             y = (float)(paddingTop + contentHeight);
 
@@ -145,7 +150,8 @@ public class GraphFactory {
             float fradius = 3.0f;
             float fOXY[] = { 0.0f, 0.0f  };
             for( Soramame.SoramameData data : list){
-                if( mDispDay != 0 && nCount > mDispDay*24 ){ break; }
+                if( nCount > mDispHour){ break; }
+                //if( mDispDay != 0 && nCount > mDispDay*24 ){ break; }
                 fradius = 3.0f;
                 switch(mMode){
                     case 0:
@@ -196,18 +202,23 @@ public class GraphFactory {
 //            }
         }
         // 測定局
+        mTextPaint.setTextSize(24.0f);
+        fontMetrics = mTextPaint.getFontMetrics();
+        // ほぼ文字高さのようなので、マイナスで返るので反転
+        TextHeight = -fontMetrics.ascent;
         canvas.drawText(String.format("%s", soramame.getMstName()), paddingLeft, paddingTop + TextHeight, mTextPaint);
 
         // 読み書きするファイル名を指定
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg");
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.png");
         // 指定したファイル名が無ければ作成する。
-        if( file.getParentFile().mkdir() ) {
+        // SDKバージョンの影響等（パーミッション）以下がエラーとなるので、一旦コメントとする。
+//        if( file.getParentFile().mkdir() ) {
             FileOutputStream fos = null;
             try {
                 fos = new FileOutputStream(file, false);
                 // 画像のフォーマットと画質と出力先を指定して保存
                 // 100で165KB、値を半分にすると1/4に減る
-                graph.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                graph.compress(Bitmap.CompressFormat.PNG, 100, fos);
                 fos.flush();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -220,7 +231,7 @@ public class GraphFactory {
                     }
                 }
             }
-        }
+//        }
 
         return graph;
     }

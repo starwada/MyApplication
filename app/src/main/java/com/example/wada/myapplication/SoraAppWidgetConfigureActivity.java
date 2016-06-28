@@ -12,6 +12,7 @@ import android.widget.EditText;
 /**
  * The configuration screen for the {@link SoraAppWidget SoraAppWidget} AppWidget.
  * これはウィジットを貼り付ける際に表示される設定用のアクティビティ
+ * ここで、貼り付ける測定局を選択する。
  */
 public class SoraAppWidgetConfigureActivity extends Activity {
 
@@ -65,9 +66,13 @@ public class SoraAppWidgetConfigureActivity extends Activity {
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
             SoraAppWidget.updateAppWidget(context, appWidgetManager, mAppWidgetId);
 
+            // ここでデータを作る
+            Soramame soramame = new Soramame(40103120, "江川観測局", "若松区");
+
             // Make sure we pass back the original appWidgetId
             Intent resultValue = new Intent();
             resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+            resultValue.putExtra("mine", soramame);
             setResult(RESULT_OK, resultValue);
             finish();
         }
