@@ -60,7 +60,7 @@ public class GraphFactory {
         Bitmap graph = Bitmap.createBitmap(nWidth, nHeight, Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(graph);
-        canvas.drawColor(Color.GRAY);
+        canvas.drawColor(Color.GREEN);
 
         int paddingLeft = 10;
         int paddingTop = 10;
@@ -201,22 +201,23 @@ public class GraphFactory {
         // 読み書きするファイル名を指定
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.jpeg");
         // 指定したファイル名が無ければ作成する。
-        file.getParentFile().mkdir();
-        FileOutputStream fos = null;
-        try {
-            fos = new FileOutputStream(file, false);
-            // 画像のフォーマットと画質と出力先を指定して保存
-            // 100で165KB、値を半分にすると1/4に減る
-            graph.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-            fos.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException ie) {
-                    fos = null;
+        if( file.getParentFile().mkdir() ) {
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(file, false);
+                // 画像のフォーマットと画質と出力先を指定して保存
+                // 100で165KB、値を半分にすると1/4に減る
+                graph.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                fos.flush();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                if (fos != null) {
+                    try {
+                        fos.close();
+                    } catch (IOException ie) {
+                        fos = null;
+                    }
                 }
             }
         }
