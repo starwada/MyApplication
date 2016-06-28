@@ -50,6 +50,7 @@ public class SoraAppWidget extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
 
+        // ウィジット設定アクティビティ（画面）にて設定した文字列（Prefファイルに保持）をここで取得。
         CharSequence widgetText = SoraAppWidgetConfigureActivity.loadTitlePref(context, appWidgetId);
         // Construct the RemoteViews object
 //        RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.sora_app_widget);
@@ -68,16 +69,12 @@ public class SoraAppWidget extends AppWidgetProvider {
 //        mOX.setStrokeWidth(2.4f);
 //        cv.drawText("Wada", 10.0f, 10.0f, mOX);
         image.setImageViewBitmap(R.id.appwidget_image, bmap);
-//        image.setTextViewText(R.id.appwidget_text, widgetText);
+        image.setTextViewText(R.id.appwidget_text, widgetText);
 
+        // ここは、テキストをクリックしたらMainActivityが起動する仕組みを設定している。
         // Create an Intent to launch ExampleActivity
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-//        Soramame soramame = intent.getParcelableExtra("mine");
-//        if(soramame != null) {
-//            widgetText = soramame.getMstName();
-//            image.setTextViewText(R.id.appwidget_text, widgetText);
-//        }
 
         // Get the layout for the App Widget and attach an on-click listener
         // to the button

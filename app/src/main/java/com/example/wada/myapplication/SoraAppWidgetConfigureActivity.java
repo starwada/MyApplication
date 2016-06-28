@@ -72,7 +72,6 @@ public class SoraAppWidgetConfigureActivity extends Activity {
             // Make sure we pass back the original appWidgetId
             Intent resultValue = new Intent();
             resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-            resultValue.putExtra("mine", soramame);
             setResult(RESULT_OK, resultValue);
             finish();
         }
