@@ -47,7 +47,7 @@ public class SoraAppWidget extends AppWidgetProvider {
 //    private static Timer timer;
     private static int nCount=0;
     private static final String ACTION_START_MY_ALARM = "com.example.wada.myapplication.ACTION_START_MY_ALARM";
-    private final long interval = 1 * 60 * 1000;
+    private final long interval = 60 * 60 * 1000;
 
     private static  final  String SORABASEURL="http://soramame.taiki.go.jp/";
     private static final String SORADATAURL = "DataList.php?MstCode=";
@@ -157,8 +157,8 @@ public class SoraAppWidget extends AppWidgetProvider {
         PendingIntent operation = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
         AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         long now = System.currentTimeMillis() + 1; // + 1 は確実に未来時刻になるようにする保険
-//        long oneHourAfter = now + interval - now % (interval);
-        long oneHourAfter = now + interval;
+        long oneHourAfter = now + interval - now % (interval);
+//        long oneHourAfter = now + interval;
         am.set(AlarmManager.RTC, oneHourAfter, operation);
     }
 

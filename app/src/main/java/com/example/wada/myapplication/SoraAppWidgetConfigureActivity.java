@@ -47,6 +47,7 @@ public class SoraAppWidgetConfigureActivity extends Activity {
     EditText mAppWidgetText;
     private static final String PREFS_NAME = "com.example.wada.myapplication.SoraAppWidget";
     private static final String PREF_PREFIX_KEY = "appwidget_";
+    private static final String PREF_MSTCODE_KEY = "mstcode_";
     private static final String SORAPREFFILE = "SoraPrefFile";
 
     private RecyclerView mRecyclerView;
@@ -130,19 +131,20 @@ public class SoraAppWidgetConfigureActivity extends Activity {
         RecyclerView station = (RecyclerView)findViewById(R.id.recycler_view);
         station.addOnItemTouchListener( new RecyclerView.SimpleOnItemTouchListener()
         {
+            // これが、複数回呼ばれる？不明？？
+            // onTouchEvent()は反応しない。
             @Override
-            public void onTouchEvent(RecyclerView rv, MotionEvent e) {
-                super.onTouchEvent(rv, e);
+            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
                 float x = e.getX();
                 float y = e.getY();
 
                 View mChildView = rv.findChildViewUnder(x, y);
 
-                int pos = 0;
+                int pos = -1;
                 if (mChildView != null) {
                     pos = rv.getChildAdapterPosition(mChildView);
                 }
-                if(mList!=null && pos != 0) {
+                if(mList!=null && !(pos < 0)) {
                     final Context context = SoraAppWidgetConfigureActivity.this;
                     mSoramame = mList.get(pos);
                     savePref(context, mAppWidgetId, mSoramame.getMstCode());
@@ -157,6 +159,7 @@ public class SoraAppWidgetConfigureActivity extends Activity {
                     setResult(RESULT_OK, resultValue);
                     finish();
                 }
+                return super.onInterceptTouchEvent(rv, e);
             }
 
         });
@@ -191,7 +194,7 @@ public class SoraAppWidgetConfigureActivity extends Activity {
 
     static void savePref(Context context, int appWidgetId, int val) {
         SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_NAME, 0).edit();
-        prefs.putInt(PREF_PREFIX_KEY + appWidgetId, val);
+        prefs.putInt(PREF_MSTCODE_KEY + appWidgetId, val);
         prefs.apply();
     }
 
@@ -209,13 +212,13 @@ public class SoraAppWidgetConfigureActivity extends Activity {
 
     static int loadPref(Context context, int appWidgetId) {
         SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, 0);
-        int titleValue = prefs.getInt(PREF_PREFIX_KEY + appWidgetId, 0);
-        return titleValue;
+        return prefs.getInt(PREF_MSTCODE_KEY + appWidgetId, 0);
     }
 
     static void deleteTitlePref(Context context, int appWidgetId) {
         SharedPreferences.Editor prefs = context.getSharedPreferences(PREFS_NAME, 0).edit();
         prefs.remove(PREF_PREFIX_KEY + appWidgetId);
+        prefs.remove(PREF_MSTCODE_KEY + appWidgetId);
         prefs.apply();
     }
 
