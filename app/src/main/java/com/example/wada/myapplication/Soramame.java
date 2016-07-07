@@ -103,6 +103,19 @@ public class Soramame implements Parcelable{
 
         SoramameData(String strYear, String strMonth, String strDay, String strHour, String strOX, String strPM25, String strWD, String strWS)
         {
+            setData(strYear, strMonth, strDay, strHour, strOX, strPM25, strWD, strWS);
+        }
+
+        SoramameData(GregorianCalendar date, float fOX, Integer nPM25, Integer nWD, float fWS){
+            //m_dDate = new GregorianCalendar(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH), date.get(Calendar.HOUR_OF_DAY), 0, 0);
+            m_dDate = date ;
+            m_fOX = fOX;
+            m_nPM25 = nPM25;
+            m_nWD = nWD;
+            m_fWS = fWS;
+        }
+
+        public void setData(String strYear, String strMonth, String strDay, String strHour, String strOX, String strPM25, String strWD, String strWS){
             // 月は０から11で表現する。取得時も。
             m_dDate = new GregorianCalendar(Integer.valueOf(strYear), Integer.valueOf(strMonth)-1,
                     Integer.valueOf(strDay), Integer.valueOf(strHour), 0);
@@ -124,15 +137,6 @@ public class Soramame implements Parcelable{
             catch(NumberFormatException e){
                 e.printStackTrace();
             }
-        }
-
-        SoramameData(GregorianCalendar date, float fOX, Integer nPM25, Integer nWD, float fWS){
-            //m_dDate = new GregorianCalendar(date.get(Calendar.YEAR), date.get(Calendar.MONTH), date.get(Calendar.DAY_OF_MONTH), date.get(Calendar.HOUR_OF_DAY), 0, 0);
-            m_dDate = date ;
-            m_fOX = fOX;
-            m_nPM25 = nPM25;
-            m_nWD = nWD;
-            m_fWS = fWS;
         }
 
         public GregorianCalendar getDate()
@@ -179,8 +183,13 @@ public class Soramame implements Parcelable{
         }
     }
 
+    // メンバーデータ
     private SoramameStation m_Station;                  // 測定局データ
     private ArrayList< SoramameData > m_aData;  // 測定データ
+    private boolean m_Select;                                   // 選択フラグ true 表示対象/false 非表示
+    private boolean mEdit;                                          // 編集フラグ true 編集した/false 未編集
+
+    private int mSelIndex;
 
     @Override
     public int describeContents(){
@@ -216,12 +225,17 @@ public class Soramame implements Parcelable{
         in.readBooleanArray(bFlag);
         m_Station.setAllow(bFlag);
         m_aData  = null;
+        m_Select = false;
+        mEdit = false;
+        mSelIndex = 0;
     }
 
     Soramame(int nCode, String strName, String strAddress)
     {
         m_Station = new SoramameStation(nCode, strName, strAddress);
         m_aData = null ;
+        m_Select = false;
+        mEdit = false;
     }
 
     public Integer getMstCode()
@@ -235,12 +249,24 @@ public class Soramame implements Parcelable{
     {
         return m_Station.getAddress();
     }
+    public boolean isSelected(){ return m_Select; }
+    public boolean isEdit(){ return  mEdit; }
+
+    public int getSelIndex(){ return mSelIndex; }
 
     // Set
     public void setData(String strYear, String strMonth, String strDay, String strHour, String strOX, String strPM25, String strWD, String strWS)
     {
         SoramameData data = new SoramameData(strYear, strMonth, strDay, strHour, strOX, strPM25, strWD, strWS);
         addData(data);
+    }
+
+    public void setData(String strDate, String strOX, String strPM25, String strWD, String strWS)
+    {
+        String strSplit[] = strDate.split( " " );
+        if(strSplit.length > 3) {
+            setData(strSplit[0], strSplit[1], strSplit[2], strSplit[3], strOX, strPM25, strWD, strWS);
+        }
     }
 
     public void setData(SoramameData orig){
@@ -264,6 +290,19 @@ public class Soramame implements Parcelable{
         return m_Station.isAllow();
     }
 
+    public boolean setAllow(int nOX, int nPM25, int nWD){
+        boolean flag[] = new boolean[3];
+        for(int i=0; i<3; i++){
+            flag[i] = false;
+        }
+        if(nOX != 0){ flag[0] = true ; }
+        if(nPM25 != 0){ flag[1] = true; }
+        if(nWD != 0){ flag[2] = true; }
+
+        m_Station.setAllow(flag);
+        return m_Station.isAllow();
+    }
+
     public boolean getAllow(int index){
         boolean flag = false;
         switch(index){
@@ -280,10 +319,23 @@ public class Soramame implements Parcelable{
         return flag;
     }
 
+    public void setSelected( int flag ){
+        m_Select = false;
+        if( flag != 0 ) {
+            m_Select = true;
+        }
+    }
+
+    public void setEdit(boolean flag){
+        mEdit = flag;
+    }
+    public void setSelIndex(int index){ mSelIndex = index; }
+
     public void clearData(){
         if( m_aData != null){
             m_aData.clear();
         }
+        m_Select = false;
     }
 
     private void addData(SoramameData data){
@@ -291,6 +343,37 @@ public class Soramame implements Parcelable{
             m_aData = new ArrayList<SoramameData>();
         }
         m_aData.add(data);
+    }
+
+    // 内部データがすでに読み込まれているかを判定する。
+    // 内部データが空ならfalse
+    // 内部データの先頭要素にて判定する。
+    // nMinute  判定間隔（分）
+    public boolean isLoaded(String strYear, String strMon, String strDay, String strHour, int nMinute){
+        // 要素が無ければfalse
+        if(getSize() < 1){ return false; }
+
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.set(Integer.valueOf(strYear), Integer.valueOf(strMon)-1, Integer.valueOf(strDay), Integer.valueOf(strHour), 0);
+
+        return isLoaded(cal, nMinute);
+    }
+
+    // nMinute  判定間隔（分）
+    public boolean isLoaded(GregorianCalendar cal, int nMinute){
+        boolean loaded = false;
+        if(m_aData == null || nMinute < 0){ return false; }
+
+//        if( m_aData.get(0).getDate().before(cal) ){ loaded = true; }
+
+        // getTimeInMillis()にてミリ秒を取得
+        // gap/60*1000 で分の差。
+        long gap = cal.getTimeInMillis() - m_aData.get(0).getDate().getTimeInMillis();
+        // ２時間半を目安とする。
+        // 更新のタイミングは計測時間の１時間半後くらいなので、前の計測時間からは２時間半となる。
+        if(gap / (60*1000) < nMinute){ loaded = true; }
+
+        return loaded;
     }
 
     public String getStationInfo()
@@ -306,7 +389,9 @@ public class Soramame implements Parcelable{
 
     public int getSize()
     {
-        return m_aData.size();
+        int size = 0;
+        if( m_aData != null){ size = m_aData.size(); }
+        return size;
     }
 
     public ArrayList<SoramameData> getData()
@@ -314,9 +399,16 @@ public class Soramame implements Parcelable{
         return m_aData;
     }
 
+    public void addAll(int index, ArrayList<Soramame.SoramameData> list){
+        if(m_aData == null){
+            m_aData = new ArrayList<SoramameData>();
+        }
+        m_aData.addAll(index, list);
+    }
+
     // 風向文字列->インデックス変換
     // 静穏 0/北 1/北北東 2/北東 3 -> 北北西 16
-    public Integer parseWD(String strWD){
+    static public Integer parseWD(String strWD){
         Integer nWD = -1;
         int start = 0;
         do {
@@ -379,7 +471,7 @@ public class Soramame implements Parcelable{
         return nWD;
     }
 
-    public Integer getValue(String strValue, Integer p){
+    static public Integer getValue(String strValue, Integer p){
         Integer value;
         value = p;
         try{
@@ -390,7 +482,7 @@ public class Soramame implements Parcelable{
         }
         return value;
     }
-    public Float getValue(String strValue, Float p){
+    static public Float getValue(String strValue, Float p){
         Float value;
         value = p;
         try{

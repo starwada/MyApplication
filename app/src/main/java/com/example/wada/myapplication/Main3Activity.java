@@ -80,7 +80,7 @@ public class Main3Activity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void result)
         {
-            Bitmap graph = GraphFactory.drawGraph(mSoradata);
+            Bitmap graph = GraphFactory.drawGraph(mSoradata, 0);
             ImageView img = (ImageView)findViewById(R.id.graph);
             img.setImageBitmap(graph);
 

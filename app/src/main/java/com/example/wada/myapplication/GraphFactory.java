@@ -19,7 +19,7 @@ import java.util.Calendar;
  */
 public class GraphFactory {
 
-    static public Bitmap drawGraph(Soramame soramame){
+    static public Bitmap drawGraph(Soramame soramame, int appWidgetId){
         int rc =0;
         float mMax[] = new float[3];  // 表示データのMAX
         TextPaint mTextPaint;
@@ -209,7 +209,7 @@ public class GraphFactory {
         canvas.drawText(String.format("%s", soramame.getMstName()), paddingLeft, paddingTop + TextHeight, mTextPaint);
 
         // 読み書きするファイル名を指定
-        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + "/capture.png");
+        File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + String.format("/soracapture_%d.png", appWidgetId));
         // 指定したファイル名が無ければ作成する。
         // SDKバージョンの影響等（パーミッション）以下がエラーとなるので、一旦コメントとする。
 //        if( file.getParentFile().mkdir() ) {
