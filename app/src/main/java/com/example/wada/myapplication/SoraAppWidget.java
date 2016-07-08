@@ -53,6 +53,8 @@ public class SoraAppWidget extends AppWidgetProvider {
     private static final String SORADATAURL = "DataList.php?MstCode=";
 
     // 以下はシステムのタイミングで呼ばれる
+    // 最初、ウィジットを画面に配置する際に設定アクティビティよりも先に呼ばれる。
+    // 後は、システムのタイミング
     @Override
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         // There may be multiple widgets active, so update all of them
@@ -97,7 +99,7 @@ public class SoraAppWidget extends AppWidgetProvider {
     }
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int appWidgetId) {
+                                int appWidgetId, Soramame soramame) {
 
         // ウィジット設定アクティビティ（画面）にて設定した文字列（Prefファイルに保持）をここで取得。
 //        CharSequence widgetText = SoraAppWidgetConfigureActivity.loadTitlePref(context, appWidgetId) + String.format("%d", nCount);
@@ -121,7 +123,8 @@ public class SoraAppWidget extends AppWidgetProvider {
 //        mOX.setStrokeWidth(2.4f);
 //        cv.drawText("Wada", 10.0f, 10.0f, mOX);
         image.setImageViewBitmap(R.id.appwidget_image, bmap);
-//        image.setTextViewText(R.id.appwidget_text, widgetText);
+        CharSequence widgetText = soramame.getMstName() + soramame.getData(0);
+        image.setTextViewText(R.id.appwidget_text, widgetText);
 
         // ここは、テキストをクリックしたらMainActivityが起動する仕組みを設定している。
         // Create an Intent to launch ExampleActivity
@@ -188,7 +191,7 @@ public class SoraAppWidget extends AppWidgetProvider {
         {
             int count = 0;
             int appWidgetId = 0;
-            Soramame soramame = new Soramame();
+            Soramame soramame = null;
             SoramameSQLHelper mDbHelper = new SoramameSQLHelper(MyService.this);
             SQLiteDatabase mDb = null;
             @Override
@@ -212,7 +215,10 @@ public class SoraAppWidget extends AppWidgetProvider {
                     if (!mDb.isOpen()) {
                         return -2;
                     }
-                    checkDB(soramame, mDb);
+                    // checkDB()の戻り値はデータ数
+                    String[] station = new String[2] ;
+                    if( checkDB(nCode, mDb, station) < 1 ){ return -3; }
+                    soramame = new Soramame(nCode, station[0], station[1]);
 
                     String url = String.format(Locale.ENGLISH, "%s%s%d", SORABASEURL, SORADATAURL, nCode);
                     Document doc = Jsoup.connect(url).get();
@@ -238,7 +244,6 @@ public class SoraAppWidget extends AppWidgetProvider {
                         Elements data = ta.getElementsByTag("td");
                         // 0 西暦/1 月/2 日/3 時間
                         // 4 SO2/5 NO/6 NO2/7 NOX/8 CO/9 OX/10 NMHC/11 CH4/12 THC/13 SPM/14 PM2.5/15 SP/16 WD/17 WS
-
                         soramame.setData(data.get(0).text(), data.get(1).text(), data.get(2).text(), data.get(3).text(),
                                 data.get(9).text(), data.get(14).text(), data.get(16).text(), data.get(17).text());
                         count++;
@@ -258,43 +263,37 @@ public class SoraAppWidget extends AppWidgetProvider {
                 Bitmap graph = GraphFactory.drawGraph(soramame, appWidgetId);
                 // ここでウィジット更新
                 AppWidgetManager manager = AppWidgetManager.getInstance(MyService.this);
-                updateAppWidget(MyService.this, manager, appWidgetId);
+                updateAppWidget(MyService.this, manager, appWidgetId, soramame);
             }
         }
 
         // soramame 測定局データ
         // db DB
         // 返り値：0    正常終了/1　DBに指定測定局データが無い（サイトからデータを取得する）
-        private int checkDB(Soramame soramame, SQLiteDatabase db) {
+        private int checkDB(int nCode, SQLiteDatabase db, String station[]) {
             int rc = 0;
 
             try {
                 if (!db.isOpen()) {
                     return -1;
                 }
-                String strWhereArg[] = {String.valueOf(soramame.getMstCode())};
+                String strWhereArg[] = {String.valueOf(nCode)};
                 // 日付でソート desc 降順（新しい->古い）
                 Cursor c = db.query(SoramameContract.FeedEntry.TABLE_NAME, null,
                         SoramameContract.FeedEntry.COLUMN_NAME_CODE + " = ?", strWhereArg, null, null, null);
-                if (c.getCount() > 0) {
-                    soramame.clearData();
-
+                rc = c.getCount();
+                if (rc > 0){
                     if (c.moveToFirst()) {
-                        Soramame mame = new Soramame(
-                                c.getInt(c.getColumnIndexOrThrow(SoramameContract.FeedEntry.COLUMN_NAME_CODE)),
-                                c.getString(c.getColumnIndexOrThrow(SoramameContract.FeedEntry.COLUMN_NAME_STATION)),
-                                c.getString(c.getColumnIndexOrThrow(SoramameContract.FeedEntry.COLUMN_NAME_ADDRESS)));
-                        mame.setSelected(1);
+                        station[0] = c.getString(c.getColumnIndexOrThrow(SoramameContract.FeedEntry.COLUMN_NAME_STATION));
+                        station[1] = c.getString(c.getColumnIndexOrThrow(SoramameContract.FeedEntry.COLUMN_NAME_ADDRESS));
                     }
                 }
                 c.close();
             } catch (SQLiteException e) {
                 e.printStackTrace();
             }
-
             return rc;
         }
-
     }
 
     // 以下はタイマー用のコード。未使用だがコメント化しておく。

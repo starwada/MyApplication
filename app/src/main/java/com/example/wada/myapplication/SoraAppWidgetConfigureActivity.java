@@ -50,10 +50,6 @@ public class SoraAppWidgetConfigureActivity extends Activity {
     private static final String PREF_MSTCODE_KEY = "mstcode_";
     private static final String SORAPREFFILE = "SoraPrefFile";
 
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-
     private static  final  String SORABASEURL="http://soramame.taiki.go.jp/";
     private static final String SORASUBURL ="MstItiran.php";
     private static final String SORADATAURL = "DataList.php?MstCode=";
@@ -65,7 +61,7 @@ public class SoraAppWidgetConfigureActivity extends Activity {
     int mPref ;                     // 都道府県コード
     private Soramame mSoramame;
 
-//    private SoramameStationAdapter mAdapter;
+    private SoramameStationAdapter mAdapter;
     ArrayList<Soramame> mList;
 
     public SoraAppWidgetConfigureActivity() {
@@ -128,30 +124,21 @@ public class SoraAppWidgetConfigureActivity extends Activity {
         // 都道府県取得
         new PrefSpinner().execute();
 
-        RecyclerView station = (RecyclerView)findViewById(R.id.recycler_view);
-        station.addOnItemTouchListener( new RecyclerView.SimpleOnItemTouchListener()
-        {
-            // これが、複数回呼ばれる？不明？？
-            // onTouchEvent()は反応しない。
+        ListView station = (ListView)findViewById(R.id.station_view);
+        station.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public boolean onInterceptTouchEvent(RecyclerView rv, MotionEvent e) {
-                float x = e.getX();
-                float y = e.getY();
-
-                View mChildView = rv.findChildViewUnder(x, y);
-
-                int pos = -1;
-                if (mChildView != null) {
-                    pos = rv.getChildAdapterPosition(mChildView);
-                }
-                if(mList!=null && !(pos < 0)) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if(mList!=null && !(position < 0)) {
                     final Context context = SoraAppWidgetConfigureActivity.this;
-                    mSoramame = mList.get(pos);
+                    mSoramame = mList.get(position);
                     savePref(context, mAppWidgetId, mSoramame.getMstCode());
 
+                    Intent serviceIntent = new Intent(context, SoraAppWidget.MyService.class);
+                    context.startService(serviceIntent);
+
                     // It is the responsibility of the configuration activity to update the app widget
-                    AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-                    SoraAppWidget.updateAppWidget(context, appWidgetManager, mAppWidgetId);
+//                    AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+//                    SoraAppWidget.updateAppWidget(context, appWidgetManager, mAppWidgetId);
 
                     // Make sure we pass back the original appWidgetId
                     Intent resultValue = new Intent();
@@ -159,9 +146,7 @@ public class SoraAppWidgetConfigureActivity extends Activity {
                     setResult(RESULT_OK, resultValue);
                     finish();
                 }
-                return super.onInterceptTouchEvent(rv, e);
             }
-
         });
     }
 
@@ -174,8 +159,8 @@ public class SoraAppWidgetConfigureActivity extends Activity {
             saveTitlePref(context, mAppWidgetId, widgetText);
 
             // It is the responsibility of the configuration activity to update the app widget
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-            SoraAppWidget.updateAppWidget(context, appWidgetManager, mAppWidgetId);
+//            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+//            SoraAppWidget.updateAppWidget(context, appWidgetManager, mAppWidgetId);
 
             // Make sure we pass back the original appWidgetId
             Intent resultValue = new Intent();
@@ -452,20 +437,11 @@ public class SoraAppWidgetConfigureActivity extends Activity {
         {
             if( mDb.isOpen()){ mDb.close(); }
             // 測定局データ取得後にリスト表示
-            mRecyclerView = (RecyclerView) findViewById(R.id.recycler_view);
-            if(mList != null && mRecyclerView != null)
+            ListView station = (ListView) findViewById(R.id.station_view);
+            if(mList != null && station != null)
             {
-                mAdapter = mRecyclerView.getAdapter();
-                if( mAdapter != null ){
-                    mAdapter = null;
-                }
-                mAdapter = new SoramameStationRecyclerAdapter(SoraAppWidgetConfigureActivity.this, mList);
-
-                mLayoutManager = new LinearLayoutManager(SoraAppWidgetConfigureActivity.this);
-                mRecyclerView.setLayoutManager(mLayoutManager);
-//        mRecyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
-                mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-                mRecyclerView.setAdapter(mAdapter);
+                mAdapter = new SoramameStationAdapter(SoraAppWidgetConfigureActivity.this, mList);
+                station.setAdapter(mAdapter);
             }
             mProgressDialog.dismiss();
         }

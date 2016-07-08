@@ -56,8 +56,8 @@ public class GraphFactory {
         mOX.setStrokeWidth(2.4f);
         float TextHeight = 3.0f;
 
-        int nWidth = 340;
-        int nHeight = 200;
+        int nWidth = 500;
+        int nHeight = 300;
         Bitmap graph = Bitmap.createBitmap(nWidth, nHeight, Bitmap.Config.ARGB_8888);
 
         Canvas canvas = new Canvas(graph);
@@ -113,6 +113,7 @@ public class GraphFactory {
         canvas.drawLine( paddingLeft, paddingTop, paddingLeft, contentHeight+paddingTop, mLine );
         y = (float)(paddingTop+contentHeight);
         mLine.setStrokeWidth(1);
+        mTextPaint.setTextSize(20.0f);
         Paint.FontMetrics fontMetrics = mTextPaint.getFontMetrics();
         // ほぼ文字高さのようなので、マイナスで返るので反転
         TextHeight = -fontMetrics.ascent;
@@ -202,7 +203,7 @@ public class GraphFactory {
 //            }
         }
         // 測定局
-        mTextPaint.setTextSize(24.0f);
+        mTextPaint.setTextSize(32.0f);
         fontMetrics = mTextPaint.getFontMetrics();
         // ほぼ文字高さのようなので、マイナスで返るので反転
         TextHeight = -fontMetrics.ascent;

@@ -179,7 +179,7 @@ public class Soramame implements Parcelable{
 
         public String Format()
         {
-            return String.format("%s:%s", getDateString(), getPM25String()) ;
+            return String.format("%s:%s", getCalendarString(), getPM25String()) ;
         }
     }
 
