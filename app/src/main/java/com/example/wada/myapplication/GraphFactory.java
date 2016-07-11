@@ -148,12 +148,12 @@ public class GraphFactory {
 
             int nCount=0;
             float doty = 0f;
-            float fradius = 3.0f;
+            float fradius = 6.0f;
             float fOXY[] = { 0.0f, 0.0f  };
             for( Soramame.SoramameData data : list){
                 if( nCount > mDispHour){ break; }
                 //if( mDispDay != 0 && nCount > mDispDay*24 ){ break; }
-                fradius = 3.0f;
+                fradius = 6.0f;
                 switch(mMode){
                     case 0:
                         doty = y-(data.getPM25() * (float)contentHeight/mDotY[mMode][5]);

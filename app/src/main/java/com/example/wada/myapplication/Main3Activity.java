@@ -10,17 +10,23 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.w3c.dom.Text;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Main3Activity extends AppCompatActivity {
     private Soramame mSoradata;
+    private static final String SORADATEFILE = "SoraDateFile";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +38,38 @@ public class Main3Activity extends AppCompatActivity {
         mSoradata = intent.getParcelableExtra("mine");
         new SoraDesc().execute(url);
 
+        getPrefInfo();
+    }
+
+    private int getPrefInfo()
+    {
+        int rc = 0 ;
+        try
+        {
+            FileInputStream infile = openFileInput(SORADATEFILE);
+            int byteCount = infile.available();
+            if(byteCount < 1 ){ infile.close(); return rc; }
+
+            byte[] readBytes = new byte[byteCount];
+            rc = infile.read(readBytes, 0, byteCount) ;
+            String strBytes = new String(readBytes);
+            infile.close();
+
+            TextView datefile = (TextView)findViewById(R.id.textView);
+            datefile.setText(strBytes);
+//            String Pref[] = strBytes.split(",");
+//            Collections.addAll(prefList, Pref);
+        }
+        catch (FileNotFoundException e)
+        {
+            rc = 1;
+        }
+        catch(IOException e)
+        {
+            rc = -1;
+        }
+
+        return rc;
     }
 
     private class SoraDesc extends AsyncTask<String, Void, Void>

@@ -31,7 +31,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Date;
 import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -51,6 +53,7 @@ public class SoraAppWidget extends AppWidgetProvider {
 
     private static  final  String SORABASEURL="http://soramame.taiki.go.jp/";
     private static final String SORADATAURL = "DataList.php?MstCode=";
+    private static final String SORADATEFILE = "SoraDateFile";
 
     // 以下はシステムのタイミングで呼ばれる
     // 最初、ウィジットを画面に配置する際に設定アクティビティよりも先に呼ばれる。
@@ -168,15 +171,27 @@ public class SoraAppWidget extends AppWidgetProvider {
     public static class MyService extends Service {
         @Override
         public int onStartCommand(Intent intent, int flags, int startId) {
-            ComponentName thisWidget = new ComponentName(this, SoraAppWidget.class);
-            AppWidgetManager manager = AppWidgetManager.getInstance(this);
-            int appWidgetIds[] = manager.getAppWidgetIds(thisWidget);
 
-            final int N = appWidgetIds.length;
-            for (int i = 0; i < N; i++) {
-                new SoraDesc().execute(appWidgetIds[i]);
+            try {
+                ComponentName thisWidget = new ComponentName(this, SoraAppWidget.class);
+                AppWidgetManager manager = AppWidgetManager.getInstance(this);
+                int appWidgetIds[] = manager.getAppWidgetIds(thisWidget);
 
-                // updateAppWidget(this, manager, appWidgetIds[i]);
+                // デバッグ用コード 呼ばれるタイミングを出力
+                Date now = new Date();
+                // MODE_APPENDにて既存ファイルの場合追加
+                FileOutputStream outfile = openFileOutput(SORADATEFILE, Context.MODE_APPEND);
+                outfile.write((now.toString() + "\n").getBytes());
+                outfile.close();
+
+                final int N = appWidgetIds.length;
+                for (int i = 0; i < N; i++) {
+                    new SoraDesc().execute(appWidgetIds[i]);
+
+                    // updateAppWidget(this, manager, appWidgetIds[i]);
+                }
+            }catch(IOException e){
+                e.printStackTrace();
             }
 
             return 0;
