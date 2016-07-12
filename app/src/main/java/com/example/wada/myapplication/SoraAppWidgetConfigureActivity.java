@@ -1,6 +1,8 @@
 package com.example.wada.myapplication;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.appwidget.AppWidgetManager;
 import android.content.ContentValues;
@@ -55,6 +57,7 @@ public class SoraAppWidgetConfigureActivity extends Activity {
     private static final String SORADATAURL = "DataList.php?MstCode=";
     // 指定都道府県の測定局一覧取得
     private static final String SORAPREFURL ="MstItiranFrame.php?Pref=";
+    private static final String ACTION_START_MY_ALARM = "com.example.wada.myapplication.ACTION_START_MY_ALARM";
 
     ProgressDialog mProgressDialog;
     String m_strMstURL;     // 測定局のURL
@@ -133,8 +136,13 @@ public class SoraAppWidgetConfigureActivity extends Activity {
                     mSoramame = mList.get(position);
                     savePref(context, mAppWidgetId, mSoramame.getMstCode());
 
-                    Intent serviceIntent = new Intent(context, SoraAppWidget.MyService.class);
-                    context.startService(serviceIntent);
+//                    Intent serviceIntent = new Intent(context, SoraAppWidget.MyService.class);
+//                    context.startService(serviceIntent);
+                    Intent alarmIntent = new Intent(context, SoraAppWidget.class);
+                    alarmIntent.setAction(ACTION_START_MY_ALARM);
+                    PendingIntent operation = PendingIntent.getBroadcast(context, mAppWidgetId, alarmIntent, 0);
+                    AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+                    am.set(AlarmManager.RTC, 0, operation);
 
                     // It is the responsibility of the configuration activity to update the app widget
 //                    AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);

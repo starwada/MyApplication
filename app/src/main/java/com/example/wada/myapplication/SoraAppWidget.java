@@ -65,10 +65,10 @@ public class SoraAppWidget extends AppWidgetProvider {
 //        for (int i = 0; i < N; i++) {
 //            updateAppWidget(context, appWidgetManager, appWidgetIds[i]);
 //        }
-        Intent serviceIntent = new Intent(context, MyService.class);
-        context.startService(serviceIntent);
+//        Intent serviceIntent = new Intent(context, MyService.class);
+//        context.startService(serviceIntent);
         // アラーム設定
-        setAlarm(context);
+//        setAlarm(context);
     }
 
     @Override

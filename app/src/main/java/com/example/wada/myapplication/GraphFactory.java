@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by Wada on 2016/06/27.
@@ -21,7 +22,6 @@ public class GraphFactory {
 
     static public Bitmap drawGraph(Soramame soramame, int appWidgetId){
         int rc =0;
-        float mMax[] = new float[3];  // 表示データのMAX
         TextPaint mTextPaint;
         Paint mBack;
         Paint mLine ;
@@ -38,7 +38,6 @@ public class GraphFactory {
         int mDispDay;               // 表示日数 0 全て
         int mDispHour = 6;              // 表示時間
 
-        mMax[0] = mMax[1] = mMax[2] = 0.0f;
         mBack = new Paint();
         mBack.setColor(Color.argb(75, 0, 0, 255));
         mLine = new Paint();
@@ -63,10 +62,10 @@ public class GraphFactory {
         Canvas canvas = new Canvas(graph);
         canvas.drawColor(Color.LTGRAY);
 
-        int paddingLeft = 10;
-        int paddingTop = 10;
-        int paddingRight = 10;
-        int paddingBottom = 10;
+        int paddingLeft = 30;
+        int paddingTop = 30;
+        int paddingRight = 30;
+        int paddingBottom = 30;
 
         int contentWidth = nWidth - paddingLeft - paddingRight;
         int contentHeight = nHeight - paddingTop - paddingBottom;
@@ -118,7 +117,7 @@ public class GraphFactory {
         // ほぼ文字高さのようなので、マイナスで返るので反転
         TextHeight = -fontMetrics.ascent;
 
-        for(int i=0; i<5; i++){
+        for(int i=0; i<4; i++){
             y -= (float)contentHeight/5;
             canvas.drawLine(paddingLeft, y, paddingLeft + contentWidth, y, mLine);
             switch(mMode){
@@ -134,6 +133,7 @@ public class GraphFactory {
             }
         }
 
+        String strHour;
         // グラフ
         if(soramame.getSize() > 0){
             ArrayList<Soramame.SoramameData> list = soramame.getData();
@@ -175,11 +175,11 @@ public class GraphFactory {
                 if( data.getDate().get(Calendar.HOUR_OF_DAY) == 0 ){
                     canvas.drawLine(x, paddingTop, x, contentHeight + paddingTop, mLine);
                 }
-                if( data.getDate().get(Calendar.HOUR_OF_DAY) == 1 ){
-                    // 日付描画
-                    canvas.drawText(String.format("%d日", data.getDate().get(Calendar.DAY_OF_MONTH)),
-                            x, paddingTop + contentHeight + TextHeight, mTextPaint);
-                }
+//                if( data.getDate().get(Calendar.HOUR_OF_DAY) == 1 ){
+                    // 時間描画
+                strHour = String.format(Locale.ENGLISH, "%d", data.getDate().get(Calendar.HOUR_OF_DAY));
+                    canvas.drawText(strHour, x-mTextPaint.measureText(strHour)/2, paddingTop+contentHeight+TextHeight, mTextPaint);
+//                }
                 // リストにてクリックしたインデックスデータに描画<-ここを画像に切替える
                 nCount += 1;
                 x -= gap;
@@ -190,17 +190,6 @@ public class GraphFactory {
                     canvas.drawLine(x+gap, fOXY[0], x+gap+gap, fOXY[1], mOX);
                 }
             }
-//            switch (mMode){
-//                case 0:
-//                    mExampleString = String.format("最高値:%.0f μg/m3", mMax[mMode]);
-//                    break;
-//                case 1:
-//                    mExampleString = String.format("最高値:%.2f ppm", mMax[mMode]);
-//                    break;
-//                case 2:
-//                    mExampleString = String.format("最高値:%.1f m/s", mMax[mMode]);
-//                    break;
-//            }
         }
         // 測定局
         mTextPaint.setTextSize(32.0f);
