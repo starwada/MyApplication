@@ -25,6 +25,7 @@ import android.os.Message;
 import android.os.Handler;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
+import android.widget.TextView;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -54,6 +55,12 @@ public class SoraAppWidget extends AppWidgetProvider {
     private static  final  String SORABASEURL="http://soramame.taiki.go.jp/";
     private static final String SORADATAURL = "DataList.php?MstCode=";
     private static final String SORADATEFILE = "SoraDateFile";
+
+    // 表示区分 PM2.5 OX（光化学オキシダント） WS（風速）
+    // GraphFactoryにも同様に定義している
+    private static final float mDotY[][] = { {10.0f, 15.0f, 35.0f, 50.0f, 70.0f, 100.0f },
+            {0.02f, 0.04f, 0.06f, 0.12f, 0.24f, 0.34f },
+            {4.0f, 7.0f, 10.0f, 13.0f, 15.0f, 25.0f}};
 
     // 以下はシステムのタイミングで呼ばれる
     // 最初、ウィジットを画面に配置する際に設定アクティビティよりも先に呼ばれる。
@@ -106,6 +113,7 @@ public class SoraAppWidget extends AppWidgetProvider {
 
         // ウィジット設定アクティビティ（画面）にて設定した文字列（Prefファイルに保持）をここで取得。
 //        CharSequence widgetText = SoraAppWidgetConfigureActivity.loadTitlePref(context, appWidgetId) + String.format("%d", nCount);
+        // Soramameを渡すようにしたので、以下はいらないな。
         int nCode = SoraAppWidgetConfigureActivity.loadPref(context, appWidgetId);
         if( nCode == 0 ){ return ; }
         // Construct the RemoteViews object
@@ -120,28 +128,31 @@ public class SoraAppWidget extends AppWidgetProvider {
         // とりあえず、optionsは未設定（規定値）の以下にて表示されるようになった。
         Bitmap bmap = BitmapFactory.decodeFile(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) +
                 String.format("/soracapture_%d.png", appWidgetId));
-//        Canvas cv = new Canvas( bmap );
-//        Paint mOX = new Paint();
-//        mOX.setColor(Color.argb(75, 255, 0, 0));
-//        mOX.setStrokeWidth(2.4f);
-//        cv.drawText("Wada", 10.0f, 10.0f, mOX);
         image.setImageViewBitmap(R.id.appwidget_image, bmap);
-        CharSequence widgetText = soramame.getMstName() + soramame.getData(0);
+        // 計測値表示
+        // 表示データ種別および値にて色を設定
+        CharSequence widgetText = soramame.getData().get(0).getPM25String();
+        float fValue = (float)soramame.getData().get(0).getPM25();
+        int nColor = Color.BLUE;
+        if(mDotY[0][0] < fValue && fValue < mDotY[0][1]){ nColor = Color.CYAN; }
+        else if(mDotY[0][1] < fValue && fValue < mDotY[0][2]){ nColor = Color.GREEN; }
+        else if(mDotY[0][2] < fValue && fValue < mDotY[0][3]){ nColor = Color.YELLOW; }
+        else if(mDotY[0][3] < fValue && fValue < mDotY[0][4]){ nColor = Color.rgb(255,128,0); }
+        else if(mDotY[0][4] < fValue){ nColor = Color.RED; }
+
+        image.setTextColor(R.id.appwidget_text, nColor);
         image.setTextViewText(R.id.appwidget_text, widgetText);
 
         // ここは、テキストをクリックしたらMainActivityが起動する仕組みを設定している。
         // Create an Intent to launch ExampleActivity
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-
         // Get the layout for the App Widget and attach an on-click listener
         // to the button
         image.setOnClickPendingIntent(R.id.appwidget_text, pendingIntent);
 
         // Instruct the widget manager to update the widget
-//        appWidgetManager.updateAppWidget(appWidgetId, views);
         appWidgetManager.updateAppWidget(appWidgetId, image);
-
     }
 
     @Override
@@ -163,7 +174,13 @@ public class SoraAppWidget extends AppWidgetProvider {
         PendingIntent operation = PendingIntent.getBroadcast(context, 0, alarmIntent, 0);
         AlarmManager am = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         long now = System.currentTimeMillis() + 1; // + 1 は確実に未来時刻になるようにする保険
+        // 以下は毎正時にアラーム
         long oneHourAfter = now + interval - now % (interval);
+        // 毎30分にアラーム
+        long lHalf = now % interval;
+        if( Math.abs(lHalf - 30*60*1000) < 1000*5 ){ oneHourAfter = now + interval; }
+        else if(lHalf < 30*60*1000){ oneHourAfter = now + 30*60*1000 - lHalf; }
+        else{ oneHourAfter = now - lHalf + 90*60*1000; }
 //        long oneHourAfter = now + interval;
         am.set(AlarmManager.RTC, oneHourAfter, operation);
     }
@@ -181,7 +198,7 @@ public class SoraAppWidget extends AppWidgetProvider {
                 Date now = new Date();
                 // MODE_APPENDにて既存ファイルの場合追加
                 FileOutputStream outfile = openFileOutput(SORADATEFILE, Context.MODE_APPEND);
-                outfile.write((now.toString() + "\n").getBytes());
+                outfile.write(String.format( Locale.ENGLISH, "%s flag:%d startId:%d\n", now.toString(), flags, startId).getBytes());
                 outfile.close();
 
                 final int N = appWidgetIds.length;

@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.graphics.Typeface;
 import android.os.Environment;
 import android.text.TextPaint;
 
@@ -192,11 +193,15 @@ public class GraphFactory {
             }
         }
         // 測定局
-        mTextPaint.setTextSize(32.0f);
+        mTextPaint.setTextSize(40.0f);
+        mTextPaint.setTypeface(Typeface.DEFAULT_BOLD);
+        mTextPaint.setColor(Color.WHITE);
         fontMetrics = mTextPaint.getFontMetrics();
         // ほぼ文字高さのようなので、マイナスで返るので反転
         TextHeight = -fontMetrics.ascent;
-        canvas.drawText(String.format("%s", soramame.getMstName()), paddingLeft, paddingTop + TextHeight, mTextPaint);
+        canvas.drawText(String.format("%s", soramame.getMstName()), paddingLeft*1.2f, paddingTop + TextHeight*0.5f, mTextPaint);
+        // 最新日時
+        canvas.drawText(String.format(Locale.JAPANESE, "%s", soramame.getData().get(0).getDateString()), paddingLeft*1.2f, paddingTop + TextHeight*1.5f, mTextPaint);
 
         // 読み書きするファイル名を指定
         File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) + String.format("/soracapture_%d.png", appWidgetId));

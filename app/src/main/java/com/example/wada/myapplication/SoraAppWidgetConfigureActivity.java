@@ -80,9 +80,9 @@ public class SoraAppWidgetConfigureActivity extends Activity {
         setResult(RESULT_CANCELED);
 
         setContentView(R.layout.sora_app_widget_configure);
-        mAppWidgetText = (EditText) findViewById(R.id.appwidget_text);
-        // ボタンにクリックリスナーを設定
-        findViewById(R.id.add_button).setOnClickListener(mOnClickListener);
+//        mAppWidgetText = (EditText) findViewById(R.id.appwidget_text);
+//        // ボタンにクリックリスナーを設定
+//        findViewById(R.id.add_button).setOnClickListener(mOnClickListener);
 
         // Find the widget id from the intent.
         Intent intent = getIntent();
@@ -99,7 +99,7 @@ public class SoraAppWidgetConfigureActivity extends Activity {
         }
 
         // エディットにテキストの初期値を設定
-        mAppWidgetText.setText(loadTitlePref(SoraAppWidgetConfigureActivity.this, mAppWidgetId));
+//        mAppWidgetText.setText(loadTitlePref(SoraAppWidgetConfigureActivity.this, mAppWidgetId));
 
         mPref = 0;
         // 都道府県インデックスを取得
@@ -158,25 +158,25 @@ public class SoraAppWidgetConfigureActivity extends Activity {
         });
     }
 
-    View.OnClickListener mOnClickListener = new View.OnClickListener() {
-        public void onClick(View v) {
-            final Context context = SoraAppWidgetConfigureActivity.this;
-
-            // When the button is clicked, store the string locally
-            String widgetText = mAppWidgetText.getText().toString();
-            saveTitlePref(context, mAppWidgetId, widgetText);
-
-            // It is the responsibility of the configuration activity to update the app widget
-//            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
-//            SoraAppWidget.updateAppWidget(context, appWidgetManager, mAppWidgetId);
-
-            // Make sure we pass back the original appWidgetId
-            Intent resultValue = new Intent();
-            resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
-            setResult(RESULT_OK, resultValue);
-            finish();
-        }
-    };
+//    View.OnClickListener mOnClickListener = new View.OnClickListener() {
+//        public void onClick(View v) {
+//            final Context context = SoraAppWidgetConfigureActivity.this;
+//
+//            // When the button is clicked, store the string locally
+//            String widgetText = mAppWidgetText.getText().toString();
+//            saveTitlePref(context, mAppWidgetId, widgetText);
+//
+//            // It is the responsibility of the configuration activity to update the app widget
+////            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+////            SoraAppWidget.updateAppWidget(context, appWidgetManager, mAppWidgetId);
+//
+//            // Make sure we pass back the original appWidgetId
+//            Intent resultValue = new Intent();
+//            resultValue.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, mAppWidgetId);
+//            setResult(RESULT_OK, resultValue);
+//            finish();
+//        }
+//    };
 
     // Write the prefix to the SharedPreferences object for this widget
     static void saveTitlePref(Context context, int appWidgetId, String text) {
@@ -218,6 +218,7 @@ public class SoraAppWidgetConfigureActivity extends Activity {
     // 都道府県
     // 内部ストレージにファイル保存する
     // 都道府県名なので固定でも問題ないが。
+    // 同じコードがMainActivityにもある
     private class PrefSpinner extends AsyncTask<Void, Void, Void>
     {
         ArrayList<String> prefList = new ArrayList<String>();
@@ -233,7 +234,7 @@ public class SoraAppWidgetConfigureActivity extends Activity {
         {
             try
             {
-                if( getPrefInfo() > 0) {
+                if( getPrefInfo() < 1) {
                     FileOutputStream outfile = openFileOutput(SORAPREFFILE, Context.MODE_PRIVATE);
 
                     String url = String.format("%s%s", SORABASEURL, SORASUBURL);
@@ -288,6 +289,7 @@ public class SoraAppWidgetConfigureActivity extends Activity {
 
                 prefList.clear();
                 String Pref[] = strBytes.split(",");
+                // 一気に設定
                 Collections.addAll(prefList, Pref);
 //                for( String ele : Pref)
 //                {
@@ -297,7 +299,7 @@ public class SoraAppWidgetConfigureActivity extends Activity {
             catch (FileNotFoundException e)
             {
                 // ファイルが無ければそらまめサイトにアクセス
-                rc = 1;
+                rc = 0;
             }
             catch(IOException e)
             {

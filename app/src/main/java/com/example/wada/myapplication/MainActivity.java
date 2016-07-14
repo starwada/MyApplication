@@ -199,7 +199,7 @@ public class MainActivity extends AppCompatActivity {
         {
             try
             {
-                if( getPrefInfo() > 0) {
+                if( getPrefInfo() < 1) {
                     FileOutputStream outfile = openFileOutput(SORAPREFFILE, Context.MODE_PRIVATE);
 
                     String url = String.format("%s%s", SORABASEURL, SORASUBURL);
@@ -263,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
             catch (FileNotFoundException e)
             {
                 // ファイルが無ければそらまめサイトにアクセス
-                rc = 1;
+                rc = 0;
             }
             catch(IOException e)
             {
