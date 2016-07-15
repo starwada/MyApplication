@@ -23,9 +23,11 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Handler;
+import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -51,6 +53,7 @@ public class SoraAppWidget extends AppWidgetProvider {
 //    private static Timer timer;
     private static int nCount=0;
     private static final String ACTION_START_MY_ALARM = "com.example.wada.myapplication.ACTION_START_MY_ALARM";
+    private static final String ACTION_START_SHARE = "com.example.wada.myapplication.ACTION_START_SHARE";
     private final long interval = 60 * 60 * 1000;
     private final long alarmtime = 30 * 60 * 1000;  // アラーム設定分
 
@@ -146,14 +149,26 @@ public class SoraAppWidget extends AppWidgetProvider {
 
         image.setTextColor(R.id.appwidget_text, nColor);
         image.setTextViewText(R.id.appwidget_text, widgetText);
+        image.setImageViewResource(R.id.shareButton, R.drawable.ic_share);
+        image.setImageViewResource(R.id.updateButton, R.drawable.ic_update);
 
         // ここは、テキストをクリックしたらMainActivityが起動する仕組みを設定している。
         // Create an Intent to launch ExampleActivity
         Intent intent = new Intent(context, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, appWidgetId, intent, 0);
         // Get the layout for the App Widget and attach an on-click listener
         // to the button
         image.setOnClickPendingIntent(R.id.appwidget_text, pendingIntent);
+        // 共有（トーストを表示するだけ、今のところ）
+        Intent shareIntent = new Intent(context, SoraAppWidget.class);
+        shareIntent.setAction(ACTION_START_SHARE);
+        PendingIntent operation = PendingIntent.getBroadcast(context, appWidgetId, shareIntent, 0);
+        image.setOnClickPendingIntent(R.id.shareButton, operation);
+        // 更新
+        Intent updateIntent = new Intent(context, SoraAppWidget.class);
+        updateIntent.setAction(ACTION_START_MY_ALARM);
+        PendingIntent update = PendingIntent.getBroadcast(context, appWidgetId, updateIntent, 0);
+        image.setOnClickPendingIntent(R.id.updateButton, update);
 
         // Instruct the widget manager to update the widget
         appWidgetManager.updateAppWidget(appWidgetId, image);
@@ -162,12 +177,19 @@ public class SoraAppWidget extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
+        // アラーム受信
         if (intent.getAction().equals(ACTION_START_MY_ALARM)) {
             if (ACTION_START_MY_ALARM.equals(intent.getAction())) {
                 Intent serviceIntent = new Intent(context, MyService.class);
                 context.startService(serviceIntent);
             }
             setAlarm(context);
+        }
+        // 共有受信
+        if (intent.getAction().equals(ACTION_START_SHARE)) {
+            Toast toast = Toast.makeText(context, "Share", Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.TOP|Gravity.START, 0, 0);
+            toast.show();
         }
     }
 
@@ -207,8 +229,6 @@ public class SoraAppWidget extends AppWidgetProvider {
                 final int N = appWidgetIds.length;
                 for (int i = 0; i < N; i++) {
                     new SoraDesc().execute(appWidgetIds[i]);
-
-                    // updateAppWidget(this, manager, appWidgetIds[i]);
                 }
             }catch(IOException e){
                 e.printStackTrace();

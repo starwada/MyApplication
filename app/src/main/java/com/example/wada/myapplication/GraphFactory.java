@@ -76,35 +76,36 @@ public class GraphFactory {
         float y = (float)(paddingTop+contentHeight);
         float rh = (float)contentHeight/mDotY[mMode][5];
 
+        int nTransparent = 128;
         mTextPaint = new TextPaint();
         mTextPaint.setFlags(Paint.ANTI_ALIAS_FLAG);
         mTextPaint.setTextAlign(Paint.Align.LEFT);
         // PM2.5/OX/WS
         // ～１０/0.0-0.02/0.2-3.9
         mRect.set( (float)paddingLeft, y-rh*mDotY[mMode][0], (float)(paddingLeft+contentWidth), y);
-        mBack.setColor(Color.argb(100, 0, 0, 255));
+        mBack.setColor(Color.argb(nTransparent, 0, 0, 255));
 //        mBack.setColor(0xFF2196F3);
         canvas.drawRect(mRect, mBack);
         // １１～１５/0.021-0.04/4.0-6.9
         mRect.set( (float)paddingLeft, y-rh*mDotY[mMode][1], (float)(paddingLeft+contentWidth), y-rh*mDotY[mMode][0]);
-        mBack.setColor(Color.argb(100, 0, 255,255));
+        mBack.setColor(Color.argb(nTransparent, 0, 255,255));
 //        mBack.setColor(0xFF81D4FA);
         canvas.drawRect(mRect, mBack);
         // １６～３５/0.041-0.06/7.0-9.9
         mRect.set( (float)paddingLeft, y-rh*mDotY[mMode][2], (float)(paddingLeft+contentWidth), y-rh*mDotY[mMode][1]);
-        mBack.setColor(Color.argb(100, 0, 255,128));
+        mBack.setColor(Color.argb(nTransparent, 0, 255,128));
         canvas.drawRect(mRect, mBack);
         // ３６～５０/0.061-0.119/10.0-12.9
         mRect.set( (float)paddingLeft, y-rh*mDotY[mMode][3], (float)(paddingLeft+contentWidth), y-rh*mDotY[mMode][2]);
-        mBack.setColor(Color.argb(100, 255, 255,0));
+        mBack.setColor(Color.argb(nTransparent, 255, 255,0));
         canvas.drawRect(mRect, mBack);
         // ５１～７０/0.12-0.239/13.0-14.9
         mRect.set( (float)paddingLeft, y-rh*mDotY[mMode][4], (float)(paddingLeft+contentWidth), y-rh*mDotY[mMode][3]);
-        mBack.setColor(Color.argb(100, 255, 128,0));
+        mBack.setColor(Color.argb(nTransparent, 255, 128,0));
         canvas.drawRect(mRect, mBack);
         // 70-100/0.24-0.34/15.0-25.0
         mRect.set( (float)paddingLeft, y-rh*mDotY[mMode][5], (float)(paddingLeft+contentWidth), y-rh*mDotY[mMode][4]);
-        mBack.setColor(Color.argb(100, 255, 0,0));
+        mBack.setColor(Color.argb(nTransparent, 255, 0,0));
         canvas.drawRect(mRect, mBack);
 
         // グラフ枠
@@ -142,9 +143,8 @@ public class GraphFactory {
             float x=paddingLeft+contentWidth;
             // ここで、時間（データ数）での分割
             // listには新しいデータから入っている
-            float gap = 0.0f ;
-            if( mDispDay == 0 ){ gap = (float)contentWidth/list.size(); }
-            else { gap = (float)contentWidth/(mDispHour) ; }
+            float gap = (float)contentWidth/(mDispHour+1) ;
+            x -= gap;
 
             y = (float)(paddingTop + contentHeight);
 
