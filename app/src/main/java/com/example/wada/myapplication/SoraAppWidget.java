@@ -32,6 +32,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
@@ -51,6 +52,7 @@ public class SoraAppWidget extends AppWidgetProvider {
     private static int nCount=0;
     private static final String ACTION_START_MY_ALARM = "com.example.wada.myapplication.ACTION_START_MY_ALARM";
     private final long interval = 60 * 60 * 1000;
+    private final long alarmtime = 30 * 60 * 1000;  // アラーム設定分
 
     private static  final  String SORABASEURL="http://soramame.taiki.go.jp/";
     private static final String SORADATAURL = "DataList.php?MstCode=";
@@ -79,11 +81,17 @@ public class SoraAppWidget extends AppWidgetProvider {
     }
 
     @Override
+    // ウィジットが削除される度に呼ばれる。
     public void onDeleted(Context context, int[] appWidgetIds) {
         // When the user deletes the widget, delete the preference associated with it.
         final int N = appWidgetIds.length;
         for (int i = 0; i < N; i++) {
             SoraAppWidgetConfigureActivity.deleteTitlePref(context, appWidgetIds[i]);
+            File image = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) +
+                    String.format("/soracapture_%d.png", appWidgetIds[i]));
+            if(image.exists()) {
+                image.delete();
+            }
         }
     }
 
@@ -98,6 +106,8 @@ public class SoraAppWidget extends AppWidgetProvider {
     }
 
     @Override
+    // 最後のウィジットが削除されるタイミングで呼ばれる。
+    // onDeleted()より後。
     public void onDisabled(Context context) {
         // Enter relevant functionality for when the last widget is disabled
         // ウィジットが無くなたらタイマーキャンセル
@@ -132,13 +142,7 @@ public class SoraAppWidget extends AppWidgetProvider {
         // 計測値表示
         // 表示データ種別および値にて色を設定
         CharSequence widgetText = soramame.getData().get(0).getPM25String();
-        float fValue = (float)soramame.getData().get(0).getPM25();
-        int nColor = Color.BLUE;
-        if(mDotY[0][0] < fValue && fValue < mDotY[0][1]){ nColor = Color.CYAN; }
-        else if(mDotY[0][1] < fValue && fValue < mDotY[0][2]){ nColor = Color.GREEN; }
-        else if(mDotY[0][2] < fValue && fValue < mDotY[0][3]){ nColor = Color.YELLOW; }
-        else if(mDotY[0][3] < fValue && fValue < mDotY[0][4]){ nColor = Color.rgb(255,128,0); }
-        else if(mDotY[0][4] < fValue){ nColor = Color.RED; }
+        int nColor = soramame.getColor(Soramame.SORAMAME_MODE_PM25, 0);
 
         image.setTextColor(R.id.appwidget_text, nColor);
         image.setTextViewText(R.id.appwidget_text, widgetText);
@@ -176,12 +180,11 @@ public class SoraAppWidget extends AppWidgetProvider {
         long now = System.currentTimeMillis() + 1; // + 1 は確実に未来時刻になるようにする保険
         // 以下は毎正時にアラーム
         long oneHourAfter = now + interval - now % (interval);
-        // 毎30分にアラーム
-        long lHalf = now % interval;
-        if( Math.abs(lHalf - 30*60*1000) < 1000*5 ){ oneHourAfter = now + interval; }
-        else if(lHalf < 30*60*1000){ oneHourAfter = now + 30*60*1000 - lHalf; }
-        else{ oneHourAfter = now - lHalf + 90*60*1000; }
-//        long oneHourAfter = now + interval;
+        // 毎指定分(alarmtime)にアラーム
+        long lCurrent = now % interval;
+        if( Math.abs(lCurrent - alarmtime) < 1000*60 ){ oneHourAfter = now + interval; }
+        else if(lCurrent < alarmtime){ oneHourAfter = now - lCurrent + alarmtime; }
+        else{ oneHourAfter = now - lCurrent + alarmtime + interval; }
         am.set(AlarmManager.RTC, oneHourAfter, operation);
     }
 

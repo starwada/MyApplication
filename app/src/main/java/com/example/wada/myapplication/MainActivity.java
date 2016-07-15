@@ -378,6 +378,7 @@ public class MainActivity extends AppCompatActivity {
         {
             try
             {
+                m_strMstURL = null;
                 if(mSoramame == null){ return null;}
                 // 本来、ここに測定局コードを指定する。
                 String url = String.format(Locale.ENGLISH, "%s%s%d", SORABASEURL, SORADATAURL, mSoramame.getMstCode());
@@ -409,6 +410,7 @@ public class MainActivity extends AppCompatActivity {
             // リスト用アクティビティ
 //            Intent intent = new Intent(MainActivity.this, DisplayMessageActivity.class);
 //            intent.setData(Uri.parse(m_strMstURL));
+            if(m_strMstURL == null){ return ; }
             Intent intent = new Intent(MainActivity.this, Main3Activity.class);
             intent.setData(Uri.parse(m_strMstURL));
             intent.putExtra("mine", mSoramame);

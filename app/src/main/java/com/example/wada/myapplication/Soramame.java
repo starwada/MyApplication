@@ -1,5 +1,6 @@
 package com.example.wada.myapplication;
 
+import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -13,6 +14,15 @@ import java.util.GregorianCalendar;
  * Created by Wada on 2015/07/03.
  */
 public class Soramame implements Parcelable{
+    public static final int SORAMAME_MODE_OX = 0;
+    public static final int SORAMAME_MODE_PM25 = 1;
+    public static final int SORAMAME_MODE_WS = 2;
+
+    // 表示区分 OX（光化学オキシダント）PM2.5  WS（風速）
+    // GraphFactoryにも同様に定義している
+    private static final float mColor[][] = { {0.02f, 0.04f, 0.06f, 0.12f, 0.24f, 0.34f },
+            {10.0f, 15.0f, 35.0f, 50.0f, 70.0f, 100.0f },
+            {4.0f, 7.0f, 10.0f, 13.0f, 15.0f, 25.0f}};
 
     // そらまめの測定局データ
     public  class SoramameStation {
@@ -303,9 +313,9 @@ public class Soramame implements Parcelable{
         return m_Station.isAllow();
     }
 
-    public boolean getAllow(int index){
+    public boolean getAllow(int mode){
         boolean flag = false;
-        switch(index){
+        switch(mode){
             case 0:
                 flag = m_Station.getAllowOX();
                 break;
@@ -382,9 +392,16 @@ public class Soramame implements Parcelable{
     }
     public String getData(int nIndex)
     {
-        if( getSize() < 1){ return ""; }
+        int nSize = getSize();
+        if( nSize < 1 && nSize <= nIndex ){ return ""; }
 
         return m_aData.get(nIndex).Format() ;
+    }
+    public SoramameData getSoramameData(int nIndex){
+        int nSize = getSize();
+        if( nSize < 1 && nSize <= nIndex ){ return null; }
+
+        return m_aData.get(nIndex) ;
     }
 
     public int getSize()
@@ -404,6 +421,37 @@ public class Soramame implements Parcelable{
             m_aData = new ArrayList<SoramameData>();
         }
         m_aData.addAll(index, list);
+    }
+
+    // 指定データ種別の指定インデックスデータに該当する表示色を返す
+    // nMode データ種別　0 OX/1 PM2.5/2 WS
+    // nIndex データインデックス
+    public int getColor(int nMode, int nIndex){
+        int color = Color.BLACK;
+        if(nMode < 0 || 2 < nMode){ return color; }
+        SoramameData data = getSoramameData(nIndex);
+        if(data == null){ return color; }
+
+        float fValue = 0.0f;
+        switch (nMode){
+            case SORAMAME_MODE_OX:
+                fValue = data.getOX();
+                break;
+            case SORAMAME_MODE_PM25:
+                fValue = (float)data.getPM25();
+                break;
+            case SORAMAME_MODE_WS:
+                fValue = data.getWS();
+                break;
+        }
+        color = Color.BLUE;
+        if(mColor[nMode][0] < fValue && fValue < mColor[nMode][1]){ color = Color.CYAN; }
+        else if(mColor[nMode][1] < fValue && fValue < mColor[nMode][2]){ color = Color.GREEN; }
+        else if(mColor[nMode][2] < fValue && fValue < mColor[nMode][3]){ color = Color.YELLOW; }
+        else if(mColor[nMode][3] < fValue && fValue < mColor[nMode][4]){ color = Color.rgb(255,128,0); }
+        else if(mColor[nMode][4] < fValue){ color = Color.RED; }
+
+        return color;
     }
 
     // 風向文字列->インデックス変換

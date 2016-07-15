@@ -111,10 +111,7 @@ public class SoraAppWidgetConfigureActivity extends Activity {
         prefspinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                String strPref = parent.getItemAtPosition(position).toString();
-
                 mPref = position + 1;
-
                 new SoraStation().execute();
             }
 
@@ -177,6 +174,17 @@ public class SoraAppWidgetConfigureActivity extends Activity {
 //            finish();
 //        }
 //    };
+
+    @Override
+    protected void onPause() {
+        // 都道府県インデックスを保存する
+        SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putInt("CurrentPref", mPref);
+        editor.apply();
+
+        super.onPause();
+    }
 
     // Write the prefix to the SharedPreferences object for this widget
     static void saveTitlePref(Context context, int appWidgetId, String text) {
