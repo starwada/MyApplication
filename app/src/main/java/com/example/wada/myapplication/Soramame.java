@@ -446,10 +446,10 @@ public class Soramame implements Parcelable{
                 break;
         }
         color = Color.BLUE;
-        if(mColor[nMode][0] < fValue && fValue < mColor[nMode][1]){ color = Color.CYAN; }
-        else if(mColor[nMode][1] < fValue && fValue < mColor[nMode][2]){ color = Color.GREEN; }
-        else if(mColor[nMode][2] < fValue && fValue < mColor[nMode][3]){ color = Color.YELLOW; }
-        else if(mColor[nMode][3] < fValue && fValue < mColor[nMode][4]){ color = Color.rgb(255,128,0); }
+        if(mColor[nMode][0] < fValue && fValue <= mColor[nMode][1]){ color = Color.CYAN; }
+        else if(mColor[nMode][1] < fValue && fValue <= mColor[nMode][2]){ color = Color.GREEN; }
+        else if(mColor[nMode][2] < fValue && fValue <= mColor[nMode][3]){ color = Color.YELLOW; }
+        else if(mColor[nMode][3] < fValue && fValue <= mColor[nMode][4]){ color = Color.rgb(255,128,0); }
         else if(mColor[nMode][4] < fValue){ color = Color.RED; }
 
         return color;
