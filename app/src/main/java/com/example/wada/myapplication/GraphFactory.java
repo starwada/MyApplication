@@ -21,6 +21,8 @@ import java.util.Locale;
  */
 public class GraphFactory {
 
+    // 以下を引数とする。
+    // グラフ背景の透過率、表示時間、表示データ種別
     static public Bitmap drawGraph(Soramame soramame, int appWidgetId){
         int rc =0;
         TextPaint mTextPaint;
@@ -37,7 +39,7 @@ public class GraphFactory {
 
         int mMode;                      // 表示データモード 0 PM2.5/1 OX/2 風速
         int mDispDay;               // 表示日数 0 全て
-        int mDispHour = 6;              // 表示時間
+        int mDispHour = 10;              // 表示時間
 
         mBack = new Paint();
         mBack.setColor(Color.argb(75, 0, 0, 255));
@@ -150,7 +152,7 @@ public class GraphFactory {
 
             int nCount=0;
             float doty = 0f;
-            float fradius = 6.0f;
+            float fradius = 8.0f;
             float fOXY[] = { 0.0f, 0.0f  };
             for( Soramame.SoramameData data : list){
                 if( nCount > mDispHour){ break; }
@@ -200,7 +202,7 @@ public class GraphFactory {
         fontMetrics = mTextPaint.getFontMetrics();
         // ほぼ文字高さのようなので、マイナスで返るので反転
         TextHeight = -fontMetrics.ascent;
-        canvas.drawText(String.format("%s", soramame.getMstName()), paddingLeft*1.2f, paddingTop + TextHeight*0.5f, mTextPaint);
+        canvas.drawText(String.format("%s", soramame.getMstName()), paddingLeft*0.5f, paddingTop + TextHeight*0.5f, mTextPaint);
         // 最新日時
         canvas.drawText(String.format(Locale.JAPANESE, "%s", soramame.getData().get(0).getDateString()), paddingLeft*1.2f, paddingTop + TextHeight*1.5f, mTextPaint);
 

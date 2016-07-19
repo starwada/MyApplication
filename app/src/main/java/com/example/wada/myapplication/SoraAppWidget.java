@@ -17,12 +17,16 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Message;
 import android.os.Handler;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
@@ -146,9 +150,23 @@ public class SoraAppWidget extends AppWidgetProvider {
         // 表示データ種別および値にて色を設定
         CharSequence widgetText = soramame.getData().get(0).getPM25String();
         int nColor = soramame.getColor(Soramame.SORAMAME_MODE_PM25, 0);
+        int nTypeface = Typeface.ITALIC;
+        float fSize = 48.0f;
+        // 未計測の場合は文字を小さくする
+        if(!soramame.getData().get(0).isValidatePM25()) {
+            fSize = 28.0f;
+            nTypeface = Typeface.NORMAL;
+        }
+
+        // 計測値にスタイルを適用したいため、以下を使用。
+        // "未計測"をイタリックにすると、wrap_contentにて端が表示されないので、スタイルを変更する。
+        // 計測値はイタリックが見栄えがいいので。
+        SpannableString text = new SpannableString(widgetText);
+        text.setSpan(new StyleSpan(nTypeface), 0, text.length(), 0);
 
         image.setTextColor(R.id.appwidget_text, nColor);
-        image.setTextViewText(R.id.appwidget_text, widgetText);
+        image.setTextViewText(R.id.appwidget_text, text);
+        image.setTextViewTextSize(R.id.appwidget_text, TypedValue.COMPLEX_UNIT_DIP, fSize);
         image.setImageViewResource(R.id.shareButton, R.drawable.ic_share);
         image.setImageViewResource(R.id.updateButton, R.drawable.ic_update);
 
@@ -177,6 +195,10 @@ public class SoraAppWidget extends AppWidgetProvider {
     @Override
     public void onReceive(Context context, Intent intent) {
         super.onReceive(context, intent);
+        // ホーム画面が回転されたのをキャッチする
+        // 以下で回転の状態を取得する。
+        //context.getResources().getConfiguration().orientation
+        // 回転の状態（縦、横）に応じてウィジットの配置設定を修正する
         // アラーム受信
         if (intent.getAction().equals(ACTION_START_MY_ALARM)) {
             if (ACTION_START_MY_ALARM.equals(intent.getAction())) {

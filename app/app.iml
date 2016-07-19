@@ -132,8 +132,5 @@
     <orderEntry type="library" exported="" name="play-services-ads-9.0.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-ads-lite-9.0.2" level="project" />
     <orderEntry type="library" exported="" name="firebase-common-9.0.2" level="project" />
-    <orderEntry type="library" exported="" name="usb-android-23" level="project" />
-    <orderEntry type="library" exported="" name="effects-android-23" level="project" />
-    <orderEntry type="library" exported="" name="maps-android-23" level="project" />
   </component>
 </module>

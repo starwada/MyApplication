@@ -173,6 +173,7 @@ public class Soramame implements Parcelable{
             return (m_nPM25 < 0 ? 0 : m_nPM25);
         }
         public String getPM25String(){ return String.format("%s",(m_nPM25 < 0 ? "未計測" : m_nPM25.toString()));}
+        public boolean isValidatePM25(){ return (m_nPM25 < 0 ? false: true); }
         public Integer getWD(){ return m_nWD; }
         public float getWDRotation(){
             return (22.5f*(m_nWD-1));
